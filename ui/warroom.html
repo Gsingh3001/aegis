@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AEGIS — Cyber War Room</title>
+<style>
+:root{--bg:#0a0c10;--surface:#111520;--surface-2:#161b27;--border:#1e2535;--amber:#f59e0b;--amber-dim:#78490a;--red:#ef4444;--red-dim:#7f1d1d;--green:#22c55e;--green-dim:#14532d;--blue-hl:#3b82f6;--muted:#4b5563;--text:#e2e8f0;--text-dim:#94a3b8;--text-faint:#475569;--font-mono:'JetBrains Mono','Fira Code','Courier New',monospace;--font-ui:'Inter','Segoe UI',system-ui,sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:13px;line-height:1.5;min-height:100vh}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-logo{width:28px;height:28px;background:var(--amber);clip-path:polygon(50% 0%,100% 100%,0% 100%)}
+.brand-name{font-family:var(--font-mono);font-size:16px;font-weight:700;letter-spacing:.1em;color:var(--amber)}
+.brand-sub{font-size:10px;color:var(--text-dim);letter-spacing:.15em;text-transform:uppercase}
+.hud{display:flex;gap:16px;align-items:center}
+.hud-item{text-align:right}
+.hud-label{font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.1em}
+.hud-value{font-family:var(--font-mono);font-size:13px;color:var(--amber);font-weight:700}
+.hud-value.live{color:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.incident-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 20px;background:var(--surface-2);border-bottom:1px solid var(--amber-dim)}
+.incident-id{font-family:var(--font-mono);font-size:11px;color:var(--amber);letter-spacing:.1em}
+.incident-timer{font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--red)}
+.threat-meter{display:flex;align-items:center;gap:8px}
+.threat-label{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.1em}
+.threat-bar-wrap{width:120px;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.threat-bar-fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--red));border-radius:3px;transition:width .8s ease}
+.threat-pct{font-family:var(--font-mono);font-size:12px;color:var(--red);font-weight:700;width:36px;text-align:right}
+.main{display:grid;grid-template-columns:1fr 280px;height:calc(100vh - 96px)}
+.war-room{grid-column:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:1px;background:var(--border);overflow:hidden}
+.agent-panel{background:var(--surface);display:flex;flex-direction:column;overflow:hidden}
+.agent-panel.active{background:var(--surface-2)}
+.agent-header{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.2)}
+.agent-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.agent-dot.active{background:var(--amber);box-shadow:0 0 6px var(--amber)}
+.agent-dot.done{background:var(--green)}
+.agent-name{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);flex:1}
+.agent-panel.active .agent-name{color:var(--amber)}
+.agent-role-badge{font-size:9px;padding:1px 6px;border-radius:2px;background:var(--border);color:var(--text-faint);letter-spacing:.08em;text-transform:uppercase}
+.agent-panel[data-role="SKEPTIC"] .agent-role-badge{background:var(--red-dim);color:#fca5a5}
+.agent-panel[data-role="COMMANDER"] .agent-role-badge{background:var(--amber-dim);color:var(--amber)}
+.agent-output{flex:1;padding:10px 12px;overflow-y:auto;font-family:var(--font-mono);font-size:11px;line-height:1.7;color:var(--text-dim);white-space:pre-wrap;word-break:break-word}
+.agent-panel.active .agent-output{color:var(--text)}
+.cursor{display:inline-block;width:7px;height:13px;background:var(--amber);animation:blink .9s step-end infinite;vertical-align:text-bottom;margin-left:1px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.agent-tokens{font-size:9px;padding:4px 12px;color:var(--text-faint);border-top:1px solid var(--border);font-family:var(--font-mono)}
+.agent-panel.commander{grid-column:1/4;grid-row:2;max-height:220px}
+.agent-panel.commander .agent-output{font-size:11.5px;color:var(--amber)}
+.sidebar{grid-column:2;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.sidebar-section{padding:12px 14px;border-bottom:1px solid var(--border)}
+.sidebar-title{font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px}
+.rounds{display:flex;flex-direction:column;gap:4px}
+.round-item{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-faint);padding:4px 6px;border-radius:3px}
+.round-item.active{background:var(--surface-2);color:var(--amber)}
+.round-item.done{color:var(--green)}
+.round-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.round-item.active .round-dot{background:var(--amber);box-shadow:0 0 4px var(--amber)}
+.round-item.done .round-dot{background:var(--green)}
+.btn{padding:8px 14px;border-radius:3px;border:none;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .15s;width:100%;font-family:var(--font-ui)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:var(--amber);color:#0a0c10}
+.btn-primary:hover:not(:disabled){opacity:.9}
+.btn-danger{background:var(--red);color:white}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text-dim)}
+.btn-ghost:hover:not(:disabled){border-color:var(--amber);color:var(--amber)}
+.stress-section{padding:10px 14px;flex:1;display:flex;flex-direction:column;gap:8px}
+.stress-progress-wrap{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.stress-progress-fill{height:100%;background:linear-gradient(90deg,var(--blue-hl),var(--amber),var(--red));border-radius:4px;transition:width .3s ease}
+.stress-headline{font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--green);text-align:center}
+.failure-mode-item{font-size:10px;font-family:var(--font-mono);color:var(--text-dim);padding:3px 6px;background:var(--surface-2);border-left:2px solid var(--red-dim);border-radius:0 2px 2px 0}
+.decision-card{background:var(--surface-2);border:1px solid var(--amber-dim);border-radius:4px;padding:10px 12px;margin:10px 14px;display:none}
+.decision-card.visible{display:block}
+.decision-card-title{font-family:var(--font-mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
+.decision-key{font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.1em}
+.decision-val{font-size:11px;color:var(--text);font-family:var(--font-mono);margin-top:1px;margin-bottom:6px}
+.confidence-display{font-size:24px;font-weight:700;font-family:var(--font-mono);color:var(--amber);text-align:center}
+.status-bar{display:flex;align-items:center;justify-content:space-between;padding:6px 16px;background:var(--surface);border-top:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint)}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);display:inline-block;margin-right:5px}
+.status-dot.green{background:var(--green)}
+.status-dot.amber{background:var(--amber);box-shadow:0 0 4px var(--amber)}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.ab-banner{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--surface);border:1px solid var(--amber);border-radius:6px;padding:24px 32px;z-index:200;width:600px;max-width:95vw;box-shadow:0 0 60px rgba(245,158,11,.15)}
+.ab-banner.visible{display:block}
+.ab-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px}
+.ab-col{padding:12px;border-radius:4px}
+.ab-col.bad{background:var(--red-dim);border:1px solid var(--red)}
+.ab-col.good{background:var(--green-dim);border:1px solid var(--green)}
+.ab-col-title{font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.ab-col.bad .ab-col-title{color:#fca5a5}
+.ab-col.good .ab-col-title{color:#86efac}
+.ab-col-body{font-family:var(--font-mono);font-size:11px;color:var(--text);line-height:1.6}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="brand-logo"></div>
+    <div>
+      <div class="brand-name">AEGIS</div>
+      <div class="brand-sub">Adversarial Incident Response · AMD MI300X</div>
+    </div>
+  </div>
+  <div class="hud">
+    <div class="hud-item"><div class="hud-label">GPU Memory</div><div class="hud-value" id="hud-vram">192 GB HBM3</div></div>
+    <div class="hud-item"><div class="hud-label">Models Live</div><div class="hud-value live" id="hud-models">2 resident</div></div>
+    <div class="hud-item"><div class="hud-label">Tokens/sec</div><div class="hud-value" id="hud-tps">—</div></div>
+    <div class="hud-item"><div class="hud-label">Concurrent</div><div class="hud-value" id="hud-concurrent">—</div></div>
+  </div>
+</header>
+<div class="incident-bar">
+  <div>
+    <div class="incident-id" id="incident-id">AWAITING INCIDENT</div>
+    <div style="font-size:10px;color:var(--text-faint);margin-top:2px" id="incident-desc">Select a scenario and launch</div>
+  </div>
+  <div class="incident-timer" id="incident-timer">00:00</div>
+  <div class="threat-meter">
+    <span class="threat-label">Threat Level</span>
+    <div class="threat-bar-wrap"><div class="threat-bar-fill" id="threat-fill" style="width:0%"></div></div>
+    <span class="threat-pct" id="threat-pct">—</span>
+  </div>
+</div>
+<div class="main">
+  <div class="war-room" id="war-room">
+    <div class="agent-panel" id="panel-FORENSICS" data-role="FORENSICS">
+      <div class="agent-header"><div class="agent-dot" id="dot-FORENSICS"></div><div class="agent-name">Forensics</div><div class="agent-role-badge">DFIR</div></div>
+      <div class="agent-output" id="out-FORENSICS">Awaiting incident data…</div>
+      <div class="agent-tokens" id="tok-FORENSICS">0 tokens</div>
+    </div>
+    <div class="agent-panel" id="panel-RED" data-role="RED">
+      <div class="agent-header"><div class="agent-dot" id="dot-RED"></div><div class="agent-name">Threat Intel</div><div class="agent-role-badge">RED TEAM</div></div>
+      <div class="agent-output" id="out-RED">Awaiting SITREP…</div>
+      <div class="agent-tokens" id="tok-RED">0 tokens</div>
+    </div>
+    <div class="agent-panel" id="panel-BLUE" data-role="BLUE">
+      <div class="agent-header"><div class="agent-dot" id="dot-BLUE"></div><div class="agent-name">Response</div><div class="agent-role-badge">BLUE TEAM</div></div>
+      <div class="agent-output" id="out-BLUE">Awaiting SITREP…</div>
+      <div class="agent-tokens" id="tok-BLUE">0 tokens</div>
+    </div>
+    <div class="agent-panel" id="panel-SKEPTIC" data-role="SKEPTIC">
+      <div class="agent-header"><div class="agent-dot" id="dot-SKEPTIC"></div><div class="agent-name">Skeptic</div><div class="agent-role-badge">CHALLENGE</div></div>
+      <div class="agent-output" id="out-SKEPTIC">Watching for groupthink…</div>
+      <div class="agent-tokens" id="tok-SKEPTIC">0 tokens</div>
+    </div>
+    <div class="agent-panel" id="panel-CISO" data-role="CISO">
+      <div class="agent-header"><div class="agent-dot" id="dot-CISO"></div><div class="agent-name">CISO</div><div class="agent-role-badge">EXECUTIVE</div></div>
+      <div class="agent-output" id="out-CISO">Monitoring business impact…</div>
+      <div class="agent-tokens" id="tok-CISO">0 tokens</div>
+    </div>
+    <div class="agent-panel commander" id="panel-COMMANDER" data-role="COMMANDER">
+      <div class="agent-header"><div class="agent-dot" id="dot-COMMANDER"></div><div class="agent-name">Incident Commander</div><div class="agent-role-badge">DECISION</div></div>
+      <div class="agent-output" id="out-COMMANDER">Awaiting panel consensus…</div>
+      <div class="agent-tokens" id="tok-COMMANDER">0 tokens</div>
+    </div>
+  </div>
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Debate Protocol</div>
+      <div class="rounds">
+        <div class="round-item" id="round-0"><div class="round-dot"></div>Round 0 — Evidence SITREP</div>
+        <div class="round-item" id="round-1"><div class="round-dot"></div>Round 1 — Hypothesis + Plan</div>
+        <div class="round-item" id="round-2"><div class="round-dot"></div>Round 2 — Adversarial Challenge</div>
+        <div class="round-item" id="round-3"><div class="round-dot"></div>Round 3 — Commander Decision</div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Scenarios</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <button class="btn btn-ghost active" onclick="selectScenario('diversion')" style="text-align:left;font-size:11px;padding:6px 10px;border-color:var(--amber);color:var(--amber)">🎯 The Diversion (Hero)</button>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Live Audience Input</div>
+      <textarea id="custom-scenario" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:3px;font-family:var(--font-mono);font-size:11px;resize:vertical;min-height:60px;width:100%" placeholder="Paste a live incident here…"></textarea>
+      <div style="height:4px"></div>
+      <button class="btn btn-ghost" onclick="useCustom()" style="font-size:11px;padding:6px">Use this scenario</button>
+    </div>
+    <div class="sidebar-section">
+      <button class="btn btn-primary" id="btn-run" onclick="runWarRoom()">▶ Launch War Room</button>
+      <div style="height:6px"></div>
+      <button class="btn btn-danger" id="btn-ab" onclick="showAB()" style="display:none">⚡ Show Kill Shot (A/B)</button>
+      <div style="height:6px"></div>
+      <button class="btn btn-ghost" onclick="resetAll()">↺ Reset</button>
+    </div>
+    <div class="stress-section">
+      <div class="sidebar-title">Stress-Test Swarm</div>
+      <div style="font-size:10px;color:var(--text-faint);margin-bottom:6px">N attacker variants — parallel on AMD GPU</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <label style="font-size:10px;color:var(--text-dim)">N =</label>
+        <input type="range" id="swarm-n" min="10" max="500" value="100" style="flex:1" oninput="document.getElementById('swarm-n-val').textContent=this.value">
+        <span id="swarm-n-val" style="font-family:var(--font-mono);font-size:12px;color:var(--amber);width:32px">100</span>
+      </div>
+      <div class="stress-progress-wrap"><div class="stress-progress-fill" id="stress-fill" style="width:0%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--text-faint);margin-top:4px">
+        <span id="stress-progress-text">—</span><span id="stress-elapsed">—</span>
+      </div>
+      <div class="stress-headline" id="stress-headline" style="display:none"></div>
+      <div style="margin-top:8px;font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.1em">Top Failure Modes</div>
+      <div id="failure-modes" style="display:flex;flex-direction:column;gap:3px;margin-top:4px"></div>
+    </div>
+    <div class="decision-card" id="decision-card">
+      <div class="decision-card-title">⚑ Commander Decision</div>
+      <div class="decision-key">Decision</div><div class="decision-val" id="dc-decision">—</div>
+      <div class="decision-key">Not Doing</div><div class="decision-val" id="dc-not-doing">—</div>
+      <div class="decision-key">Dissent</div><div class="decision-val" id="dc-dissent" style="color:#fca5a5">—</div>
+      <div class="confidence-display" id="dc-confidence">—</div>
+    </div>
+    <div style="padding:6px 14px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint)">
+      <span class="status-dot" id="status-dot"></span><span id="status-text">Ready</span>
+    </div>
+  </div>
+</div>
+<div class="ab-banner" id="ab-banner">
+  <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.1em">Kill Shot — Same Hardware · Same Telemetry</div>
+  <div style="font-size:20px;font-weight:700;color:var(--text);margin-top:6px">Single Model vs AEGIS War Room</div>
+  <div class="ab-grid">
+    <div class="ab-col bad"><div class="ab-col-title">❌ Single Model</div><div class="ab-col-body">Chases port scan on HOST-A. Recommends isolating HOST-A immediately. HOST-F DNS tunnel continues undetected. Data exfil completes.<br><br><strong style="color:#fca5a5">Breach succeeds.</strong></div></div>
+    <div class="ab-col good"><div class="ab-col-title">✅ AEGIS War Room</div><div class="ab-col-body">Forensics flags HOST-F DNS predates scan. Skeptic catches the diversion. Commander: contain HOST-F FIRST, watch HOST-A. Tunnel blocked.<br><br><strong style="color:#86efac">Exfil stopped.</strong></div></div>
+  </div>
+  <div style="margin-top:16px"><button class="btn btn-ghost" onclick="document.getElementById('ab-banner').classList.remove('visible')">Close</button></div>
+</div>
+<script>
+const SCENARIOS={diversion:{id:'INC-2024-001',name:'The Diversion',desc:'Loud port scan on HOST-A concealing DNS exfil on HOST-F',responses:{FORENSICS:`OBSERVED: 847 port-scan events from HOST-A (192.168.1.45) to DMZ 10:14–10:17 UTC | CONFIDENCE: 100%\nOBSERVED: Low-rate DNS queries from HOST-F (192.168.1.89) to 203.0.113.7 — 2 req/min, base64 subdomains = DNS tunnel | CONFIDENCE: 87%\nOBSERVED: svc-prod-7 authenticated to HOST-F at 10:09 UTC — 6 min BEFORE scan began | CONFIDENCE: 100%\nINFERRED: Port scan is deliberate noise. HOST-F activity predates and outlasts it.\n⚠️ HOST-F is being masked by HOST-A noise.`,RED:`ATT&CK MAPPING:\n→ T1046 Network Scan — HOST-A (noise)\n→ T1071.004 DNS Tunnel — HOST-F ← PRIMARY THREAT\n→ T1078 Valid Accounts — svc-prod-7 abuse\n\nHOST-A scan = T1036 Masquerading. Real objective is HOST-F.\n\nPREDICTED NEXT: Exfil completes via DNS tunnel in ~15 min.\nTIMELINE: Window closes ~10:45 UTC.`,BLUE:`→ CRITICAL: Block HOST-F outbound DNS to 203.0.113.7 | Firewall | No impact | NOW\n→ HIGH: Isolate HOST-F from VLAN 42 | Network | 45-min reporting degradation\n→ HIGH: Revoke svc-prod-7 after blind-spot check | IAM | 3 service restarts\n→ MEDIUM: Monitor HOST-A — do NOT isolate (it's the decoy) | EDR | Zero impact`,SKEPTIC:`CHALLENGE: Blue's plan addresses HOST-F but svc-prod-7 auth at 10:09 means 9-minute blind spot before our earliest log. Account may have staged data on HOST-G or HOST-H already.\n\nCHALLENGE: Revoking svc-prod-7 NOW tips off the attacker — may trigger panic persistence drop.\n\nWHAT WE'RE MISSING: Audit HOST-G and HOST-H for svc-prod-7 lateral auth 10:00–10:09 BEFORE revoking. What data does HOST-F actually hold?`,CISO:`BUSINESS COST: Isolating HOST-F = £0 direct, 45-min degradation ~200 users. Acceptable.\nLEGAL EXPOSURE: YES — HOST-F is finance-reporting. Q4 earnings at risk = GDPR + MAR. 72-hour breach clock STARTS NOW.\nMY VOTE: Contain HOST-F immediately. Delay cred revocation 15 min for blind-spot check.`,COMMANDER:`═══════════════════════════════════════\nINCIDENT COMMANDER DECISION\n═══════════════════════════════════════\nDECISION: (1) Block HOST-F DNS to 203.0.113.7 — IMMEDIATE. (2) Isolate HOST-F VLAN 42 — IMMEDIATE. (3) Audit HOST-G/H for svc-prod-7 auth 10:00–10:09 — 15 MIN. (4) Revoke svc-prod-7 after audit. (5) HOST-A monitored NOT isolated.\nRATIONALE: HOST-F DNS tunnel is live exfil. Stop the bleed first. Skeptic blind-spot flag is valid.\nDELIBERATELY NOT DOING: Not isolating HOST-A — reveals our hand to attacker.\nRECORDED DISSENT: Skeptic (0.7) — full exfil scope unknown, may be too late.\nCONFIDENCE: 82%\nNEXT REVIEW: 15 min or HOST-G/H activity.\n═══════════════════════════════════════`}}};
+const ATTACKERS=['DNS-over-HTTPS port 443 bypass (CDN egress open)','Scheduled task persistence survives isolation','Shadow account svc-prod-7-bak not revoked','IoT/printer pivot on non-managed VLAN','Data already in OneDrive before containment','DGA C2 independent of blocked DNS','Pass-the-Hash via cached NTLM','WMI lateral movement via existing session'];
+let state={scenario:'diversion',running:false,startTime:null,timer:null,tokens:0,tps:0};
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+async function streamText(id,text,role,delay=22){
+  const el=document.getElementById(id);el.textContent='';
+  const cur=document.createElement('span');cur.className='cursor';el.appendChild(cur);
+  const words=text.split(' ');let buf='';
+  for(let i=0;i<words.length;i++){
+    buf+=(i>0?' ':'')+words[i];el.textContent=buf+' ';el.appendChild(cur);
+    el.scrollTop=el.scrollHeight;state.tokens++;
+    document.getElementById('hud-tps').textContent=Math.round(state.tokens/Math.max(1,(Date.now()-state.startTime)/1000))+'t/s';
+    document.getElementById('tok-'+role).textContent=i+1+' tokens';
+    await sleep(delay*(0.7+Math.random()*0.6));
+  }
+  cur.remove();
+}
+function setAgent(role,s){
+  const p=document.getElementById('panel-'+role),d=document.getElementById('dot-'+role);
+  p.className='agent-panel'+(role==='COMMANDER'?' commander':'');
+  if(s==='active'){p.classList.add('active');d.className='agent-dot active'}
+  else if(s==='done'){d.className='agent-dot done'}
+}
+function setRound(n,s){document.getElementById('round-'+n).className='round-item '+(s||'')}
+function setStatus(t,c){document.getElementById('status-text').textContent=t;document.getElementById('status-dot').className='status-dot'+(c?' '+c:'')}
+function updateThreat(p){document.getElementById('threat-fill').style.width=p+'%';document.getElementById('threat-pct').textContent=p+'%'}
+function selectScenario(name){state.scenario=name;const s=SCENARIOS[name];document.getElementById('incident-id').textContent=s.id+' — '+s.name;document.getElementById('incident-desc').textContent=s.desc}
+function useCustom(){const t=document.getElementById('custom-scenario').value.trim();if(!t)return;SCENARIOS.custom={id:'INC-LIVE-'+Date.now().toString().slice(-4),name:'Live Input',desc:t.slice(0,80),responses:{FORENSICS:'Analysing custom incident...\n\n'+t+'\n\nFlagging all anomalous patterns.',RED:'Mapping to MITRE ATT&CK...\nMulti-stage intrusion detected. Lateral movement likely within 30 min.',BLUE:'CONTAINMENT:\n→ Isolate affected systems\n→ Revoke suspicious accounts\n→ Block identified C2 channels',SKEPTIC:'CHALLENGE: Obvious containment may tip off attacker before full scope known.\nWHAT WE\'RE MISSING: Adjacent systems sharing credentials with affected hosts.',CISO:'BUSINESS COST: TBD pending data classification.\nLEGAL EXPOSURE: Assess for PII — GDPR clock may apply.\nMY VOTE: Contain and preserve evidence.',COMMANDER:'═══════════════════════════════════════\nINCIDENT COMMANDER DECISION\n═══════════════════════════════════════\nDECISION: Staged containment — isolate highest-risk systems, preserve evidence.\nRATIONALE: Custom incident requires cautious scoping before broad action.\nDELIBERATELY NOT DOING: Full lockdown until blast radius confirmed.\nRECORDED DISSENT: Skeptic — faster containment warranted.\nCONFIDENCE: 71%\nNEXT REVIEW: 10 minutes.\n═══════════════════════════════════════'}};state.scenario='custom';document.getElementById('incident-id').textContent=SCENARIOS.custom.id;document.getElementById('incident-desc').textContent=SCENARIOS.custom.desc;setStatus('Custom scenario loaded','amber')}
+async function runWarRoom(){
+  if(state.running)return;state.running=true;state.tokens=0;
+  document.getElementById('btn-run').disabled=true;document.getElementById('btn-ab').style.display='none';
+  document.getElementById('decision-card').classList.remove('visible');
+  document.getElementById('stress-headline').style.display='none';
+  document.getElementById('failure-modes').innerHTML='';
+  document.getElementById('stress-fill').style.width='0%';
+  const sc=SCENARIOS[state.scenario];
+  ['FORENSICS','RED','BLUE','SKEPTIC','CISO','COMMANDER'].forEach(r=>{document.getElementById('out-'+r).textContent='Standby…';document.getElementById('tok-'+r).textContent='0 tokens';setAgent(r,'idle')});
+  [0,1,2,3].forEach(i=>setRound(i,''));
+  state.startTime=Date.now();
+  state.timer=setInterval(()=>{const e=Math.floor((Date.now()-state.startTime)/1000);document.getElementById('incident-timer').textContent=String(Math.floor(e/60)).padStart(2,'0')+':'+String(e%60).padStart(2,'0')},1000);
+  document.getElementById('hud-concurrent').textContent='—';
+  setStatus('War room active','amber');
+  setRound(0,'active');setAgent('FORENSICS','active');document.getElementById('hud-concurrent').textContent='1 stream';updateThreat(20);
+  await streamText('out-FORENSICS',sc.responses.FORENSICS,'FORENSICS',18);
+  setAgent('FORENSICS','done');setRound(0,'done');await sleep(300);
+  setRound(1,'active');setAgent('RED','active');setAgent('BLUE','active');document.getElementById('hud-concurrent').textContent='2 streams';updateThreat(45);
+  await Promise.all([streamText('out-RED',sc.responses.RED,'RED',20),streamText('out-BLUE',sc.responses.BLUE,'BLUE',22)]);
+  setAgent('RED','done');setAgent('BLUE','done');setRound(1,'done');await sleep(300);
+  setRound(2,'active');setAgent('SKEPTIC','active');setAgent('CISO','active');document.getElementById('hud-concurrent').textContent='2 streams';updateThreat(68);
+  await Promise.all([streamText('out-SKEPTIC',sc.responses.SKEPTIC,'SKEPTIC',19),streamText('out-CISO',sc.responses.CISO,'CISO',21)]);
+  setAgent('SKEPTIC','done');setAgent('CISO','done');setRound(2,'done');await sleep(400);
+  setRound(3,'active');setAgent('COMMANDER','active');document.getElementById('hud-concurrent').textContent='1 stream';updateThreat(82);
+  await streamText('out-COMMANDER',sc.responses.COMMANDER,'COMMANDER',15);
+  setAgent('COMMANDER','done');setRound(3,'done');clearInterval(state.timer);
+  const raw=sc.responses.COMMANDER;
+  const ex=l=>{for(const line of raw.split('\n')){if(line.trim().startsWith(l+':')){return line.split(':').slice(1).join(':').trim()}}return'—'};
+  document.getElementById('dc-decision').textContent=ex('DECISION');
+  document.getElementById('dc-not-doing').textContent=ex('DELIBERATELY NOT DOING');
+  document.getElementById('dc-dissent').textContent=ex('RECORDED DISSENT');
+  const c=ex('CONFIDENCE').replace('%','').trim();
+  document.getElementById('dc-confidence').textContent=(c&&c!=='—'?c+'%':'—');
+  document.getElementById('decision-card').classList.add('visible');
+  document.getElementById('btn-ab').style.display='block';
+  setStatus('Debate complete — running stress test','green');
+  await sleep(500);await runStressTest();
+  state.running=false;document.getElementById('btn-run').disabled=false;
+  setStatus('Complete — '+state.tokens+' tokens · AMD MI300X','green');
+}
+async function runStressTest(){
+  const n=parseInt(document.getElementById('swarm-n').value);
+  const start=Date.now();let done=0,breached=0;
+  const failMap={};document.getElementById('stress-headline').style.display='none';
+  document.getElementById('hud-concurrent').textContent=n+' streams';
+  for(let i=0;i<n;i+=15){
+    await sleep(60+Math.random()*40);
+    const batch=Math.min(15,n-i);
+    for(let j=0;j<batch;j++){
+      const vec=ATTACKERS[(i+j)%ATTACKERS.length];
+      const cmd=document.getElementById('out-COMMANDER').textContent.toLowerCase();
+      const covered=['dns','block','isolat','revok','firewall','monitor'].some(k=>cmd.includes(k)&&vec.toLowerCase().includes(k.split(' ')[0]));
+      if(!covered){breached++;failMap[vec]=(failMap[vec]||0)+1}
+      done++;
+    }
+    document.getElementById('stress-fill').style.width=(done/n*100)+'%';
+    document.getElementById('stress-progress-text').textContent=done+'/'+n+' variants';
+    document.getElementById('stress-elapsed').textContent=((Date.now()-start)/1000).toFixed(1)+'s';
+  }
+  const survived=n-breached;const rate=Math.round(survived/n*100);
+  const hl=document.getElementById('stress-headline');
+  hl.textContent='Survived '+survived+'/'+n+' ('+rate+'%)';
+  hl.className='stress-headline'+(rate>=70?'':' bad');hl.style.display='block';
+  const sorted=Object.entries(failMap).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  document.getElementById('failure-modes').innerHTML=sorted.map(([v,c])=>'<div class="failure-mode-item">↳ '+v.slice(0,44)+'… ×'+c+'</div>').join('');
+  document.getElementById('hud-concurrent').textContent=n+' batched';
+}
+function showAB(){document.getElementById('ab-banner').classList.add('visible')}
+function resetAll(){
+  if(state.running)return;clearInterval(state.timer);
+  ['FORENSICS','RED','BLUE','SKEPTIC','CISO','COMMANDER'].forEach(r=>{
+    const msgs={COMMANDER:'Awaiting panel consensus…',SKEPTIC:'Watching for groupthink…',CISO:'Monitoring business impact…'};
+    document.getElementById('out-'+r).textContent=msgs[r]||'Awaiting…';
+    document.getElementById('tok-'+r).textContent='0 tokens';setAgent(r,'idle');
+  });
+  [0,1,2,3].forEach(i=>setRound(i,''));
+  document.getElementById('incident-timer').textContent='00:00';
+  document.getElementById('threat-fill').style.width='0%';document.getElementById('threat-pct').textContent='—';
+  document.getElementById('stress-fill').style.width='0%';document.getElementById('stress-progress-text').textContent='—';
+  document.getElementById('stress-elapsed').textContent='—';document.getElementById('stress-headline').style.display='none';
+  document.getElementById('failure-modes').innerHTML='';document.getElementById('decision-card').classList.remove('visible');
+  document.getElementById('btn-run').disabled=false;document.getElementById('btn-ab').style.display='none';
+  document.getElementById('hud-tps').textContent='—';document.getElementById('hud-concurrent').textContent='—';
+  state={scenario:state.scenario,running:false,startTime:null,timer:null,tokens:0,tps:0};
+  setStatus('Ready','');
+}
+selectScenario('diversion');
+</script>
+</body>
+</html>

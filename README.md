@@ -41,3 +41,15 @@ http://localhost:8889/warroom_v4.html
 - Stress test: **120 variants in ~2 seconds**
 - Peak VRAM: **148GB** — impossible on NVIDIA H100 (80GB)
 - Scenarios tested: **4 enterprise-grade APT scenarios**
+
+## License & Copyright
+
+Copyright (c) 2026 Gagandeep Singh. All Rights Reserved.
+
+**No permission is granted to commercialise, distribute, or use this 
+software for commercial purposes without prior written approval from 
+Gagandeep Singh.**
+
+Contact: Gagan.singh7142@gmail.com
+
+Built during AMD AI Hackathon 2026 — Team-557

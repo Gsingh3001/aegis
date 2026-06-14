@@ -1,0 +1,87 @@
+import asyncio, json, sys
+from aiohttp import web
+import aiohttp_cors
+sys.path.insert(0, '/workspace/aegis')
+from serving.vllm_backend import install_vllm_backends
+from orchestrator.engine import run_debate, run_stress_test, BACKENDS, DebateContext, DecisionArtifact
+
+install_vllm_backends(
+    main_url="http://localhost:8001/v1",
+    main_model="/workspace/models/mistral7b",
+    fast_url="http://localhost:8003/v1",
+    fast_model="/workspace/models/tinyllama"
+)
+
+async def run_warroom(request):
+    data = await request.json()
+    telemetry = {"incident_id": data.get("incident_id","INC-LIVE"), "raw_input": data.get("telemetry",""), "source":"live"}
+    response = web.StreamResponse()
+    response.headers['Content-Type'] = 'text/event-stream'
+    response.headers['Cache-Control'] = 'no-cache'
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    await response.prepare(request)
+    queue = asyncio.Queue()
+    def on_token(role, token):
+        asyncio.get_event_loop().call_soon_threadsafe(queue.put_nowait, {"role":role,"token":token})
+    async def debate_task():
+        try:
+            ctx, decision = await run_debate(data.get("incident_id","INC-LIVE"), telemetry, stream_callback=on_token)
+            if decision:
+                await queue.put({"type":"decision","decision":decision.decision,"dissent":decision.dissent,"confidence":decision.confidence,"elapsed":decision.elapsed_s,"raw":decision.raw})
+        except Exception as e:
+            await queue.put({"type":"error","message":str(e)})
+        finally:
+            await queue.put(None)
+    asyncio.create_task(debate_task())
+    while True:
+        msg = await queue.get()
+        if msg is None: break
+        try: await response.write(f"data: {json.dumps(msg)}\n\n".encode())
+        except: break
+    await response.write(b"data: {\"type\": \"done\"}\n\n")
+    return response
+
+async def run_stress(request):
+    data = await request.json()
+    decision = DecisionArtifact(incident_id=data.get("incident_id","INC"), decision=data.get("decision",""), dissent=data.get("dissent",""), confidence=data.get("confidence",75), raw=data.get("raw",""), elapsed_s=0)
+    ctx = DebateContext(incident_id=decision.incident_id, telemetry={"incident_id":decision.incident_id})
+    response = web.StreamResponse()
+    response.headers['Content-Type'] = 'text/event-stream'
+    response.headers['Cache-Control'] = 'no-cache'
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    await response.prepare(request)
+    queue = asyncio.Queue()
+    async def stress_task():
+        async def on_progress(done, total):
+            await queue.put({"type":"progress","done":done,"total":total})
+        try:
+            report = await run_stress_test(decision, ctx, n=data.get("n",100), on_progress=on_progress)
+            await queue.put({"type":"stress_result",**report})
+        except Exception as e:
+            await queue.put({"type":"error","message":str(e)})
+        finally:
+            await queue.put(None)
+    asyncio.create_task(stress_task())
+    while True:
+        msg = await queue.get()
+        if msg is None: break
+        try: await response.write(f"data: {json.dumps(msg)}\n\n".encode())
+        except: break
+    await response.write(b"data: {\"type\": \"done\"}\n\n")
+    return response
+
+async def health(request):
+    return web.json_response({"status":"ok","backends":list(BACKENDS.keys())})
+
+app = web.Application()
+app.router.add_post('/run', run_warroom)
+app.router.add_post('/stress', run_stress)
+app.router.add_get('/health', health)
+cors = aiohttp_cors.setup(app, defaults={"*": aiohttp_cors.ResourceOptions(allow_credentials=True, expose_headers="*", allow_headers="*", allow_methods=["POST","GET","OPTIONS"])})
+for route in list(app.router.routes()):
+    try: cors.add(route)
+    except: pass
+
+if __name__ == '__main__':
+    print("✅ AEGIS API Server on port 8889")
+    web.run_app(app, host='0.0.0.0', port=8891)

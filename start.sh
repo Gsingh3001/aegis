@@ -1,6 +1,6 @@
 #!/bin/bash
 # ══════════════════════════════════════════════════════
-# AEGIS — One Command Startup Script
+# AEGIS — One Command Startup
 # AMD AI Hackathon 2026 · Team-557 · Gagandeep Singh
 # Usage: bash start.sh
 # ══════════════════════════════════════════════════════
@@ -13,46 +13,49 @@ echo "████████████████████████�
 echo ""
 
 # ── Step 1: Download models if not present ──────────────
-echo "[ 1/5 ] Checking models..."
+echo "[ 1/6 ] Checking models..."
 
-if [ ! -d "/workspace/models/tinyllama" ]; then
-  echo "  Downloading TinyLlama..."
-  python3 -c "
-from huggingface_hub import snapshot_download
-snapshot_download('TinyLlama/TinyLlama-1.1B-Chat-v1.0', local_dir='/workspace/models/tinyllama')
-print('TinyLlama DONE')
-" > /workspace/dl_tiny.log 2>&1 &
-else
-  echo "  ✅ TinyLlama already present"
-fi
-
-if [ ! -d "/workspace/models/mistral7b" ]; then
+if [ ! -f "/workspace/models/mistral7b/config.json" ]; then
   echo "  Downloading Mistral 7B..."
   python3 -c "
 from huggingface_hub import snapshot_download
 snapshot_download('mistralai/Mistral-7B-Instruct-v0.3', local_dir='/workspace/models/mistral7b')
 print('Mistral DONE')
-" > /workspace/dl_mistral.log 2>&1 &
+" > /workspace/dl_mistral.log 2>&1
+  echo "  ✅ Mistral 7B downloaded"
 else
   echo "  ✅ Mistral 7B already present"
 fi
 
-# Wait for downloads if they were needed
-if [ -f /workspace/dl_tiny.log ] || [ -f /workspace/dl_mistral.log ]; then
-  echo "  Waiting for model downloads..."
-  wait
-  echo "  ✅ Models ready"
+if [ ! -f "/workspace/models/tinyllama/config.json" ]; then
+  echo "  Downloading TinyLlama..."
+  python3 -c "
+from huggingface_hub import snapshot_download
+snapshot_download('TinyLlama/TinyLlama-1.1B-Chat-v1.0', local_dir='/workspace/models/tinyllama')
+print('TinyLlama DONE')
+" > /workspace/dl_tiny.log 2>&1
+  echo "  ✅ TinyLlama downloaded"
+else
+  echo "  ✅ TinyLlama already present"
 fi
 
-# ── Step 2: Launch vLLM servers ─────────────────────────
+# ── Step 2: Kill any existing servers ───────────────────
 echo ""
-echo "[ 2/5 ] Launching vLLM servers..."
-
-# Kill any existing instances
+echo "[ 2/6 ] Cleaning up existing servers..."
 pkill -f "vllm.entrypoints" 2>/dev/null
+pkill -f "api_server" 2>/dev/null
+pkill -f "http.server" 2>/dev/null
+fuser -k 8001/tcp 2>/dev/null
+fuser -k 8003/tcp 2>/dev/null
+fuser -k 8891/tcp 2>/dev/null
+fuser -k 7777/tcp 2>/dev/null
 sleep 3
+echo "  ✅ Ports cleared"
 
-# Launch Mistral on port 8001
+# ── Step 3: Launch vLLM servers ─────────────────────────
+echo ""
+echo "[ 3/6 ] Launching vLLM servers..."
+
 python3 -m vllm.entrypoints.openai.api_server \
   --model /workspace/models/mistral7b \
   --port 8001 \
@@ -62,7 +65,6 @@ python3 -m vllm.entrypoints.openai.api_server \
   > /workspace/vllm_mistral.log 2>&1 &
 echo "  Mistral 7B launching on port 8001 (PID $!)"
 
-# Launch TinyLlama on port 8003
 python3 -m vllm.entrypoints.openai.api_server \
   --model /workspace/models/tinyllama \
   --port 8003 \
@@ -72,12 +74,10 @@ python3 -m vllm.entrypoints.openai.api_server \
   > /workspace/vllm_tiny.log 2>&1 &
 echo "  TinyLlama launching on port 8003 (PID $!)"
 
-# ── Step 3: Wait for both servers ───────────────────────
+# ── Step 4: Wait for vLLM servers ───────────────────────
 echo ""
-echo "[ 3/5 ] Waiting for servers to be ready..."
-echo "  (This takes 3-5 minutes on first load)"
-
-for i in {1..60}; do
+echo "[ 4/6 ] Waiting for vLLM servers (3-5 minutes)..."
+for i in {1..120}; do
   M=$(curl -s http://localhost:8001/health 2>/dev/null)
   T=$(curl -s http://localhost:8003/health 2>/dev/null)
   if [ ! -z "$M" ] && [ ! -z "$T" ]; then
@@ -86,69 +86,70 @@ for i in {1..60}; do
     echo "  ✅ TinyLlama UP (port 8003)"
     break
   fi
-  echo -n "  Attempt $i/60 — waiting 10s..."
-  if [ ! -z "$M" ]; then echo -n " Mistral✅"; else echo -n " Mistral⏳"; fi
-  if [ ! -z "$T" ]; then echo " TinyLlama✅"; else echo " TinyLlama⏳"; fi
-  sleep 10
+  echo -n "."
+  sleep 5
 done
 
-# ── Step 4: Launch UI server ─────────────────────────────
+# Verify both up
+M=$(curl -s http://localhost:8001/health 2>/dev/null)
+T=$(curl -s http://localhost:8003/health 2>/dev/null)
+if [ -z "$M" ] || [ -z "$T" ]; then
+  echo ""
+  echo "⚠️  vLLM servers not responding — check logs:"
+  echo "   tail -20 /workspace/vllm_mistral.log"
+  echo "   tail -20 /workspace/vllm_tiny.log"
+  exit 1
+fi
+
+# ── Step 5: Launch API + UI servers ─────────────────────
 echo ""
-echo "[ 4/5 ] Launching UI server on port 8889..."
-pkill -f "http.server 8889" 2>/dev/null
-sleep 1
-cd /workspace/aegis/ui && python3 -m http.server 8889 > /workspace/ui.log 2>&1 &
-echo "  ✅ UI server running (PID $!)"
+echo "[ 5/6 ] Launching API and UI servers..."
 
-# ── Step 5: Run smoke test ───────────────────────────────
+pip install aiohttp-cors --quiet --break-system-packages 2>/dev/null
+
+python3 /workspace/aegis/api_server.py > /workspace/api_server.log 2>&1 &
+sleep 5
+curl -s http://localhost:8891/health > /dev/null && echo "  ✅ API server UP (port 8891)" || echo "  ⚠️  API server issue — check /workspace/api_server.log"
+
+cd /workspace/aegis/ui && python3 -m http.server 7777 > /workspace/ui.log 2>&1 &
+sleep 2
+echo "  ✅ UI server UP (port 7777)"
+
+# ── Step 6: Smoke test ───────────────────────────────────
 echo ""
-echo "[ 5/5 ] Running smoke test..."
-cd /workspace && python3 << 'PYEOF'
-import asyncio, sys
-sys.path.insert(0, '/workspace/aegis')
-from serving.vllm_backend import install_vllm_backends
-from orchestrator.engine import run_debate
-from scenarios.library import get_scenario
+echo "[ 6/6 ] Running smoke test..."
+RESULT=$(curl -s -X POST http://localhost:8891/run \
+  -H "Content-Type: application/json" \
+  -d '{"telemetry":"ALERT-001 HIGH SIEM:92 HOST-A port scan. ALERT-002 LOW SIEM:31 HOST-F DNS tunnel.","incident_id":"INC-SMOKE-TEST"}' \
+  --max-time 30 2>/dev/null | head -5)
 
-install_vllm_backends(
-    main_url="http://localhost:8001/v1",
-    main_model="/workspace/models/mistral7b",
-    fast_url="http://localhost:8003/v1",
-    fast_model="/workspace/models/tinyllama"
-)
+if echo "$RESULT" | grep -q "token"; then
+  echo "  ✅ Real LLM tokens flowing — Mistral-7B is reasoning"
+else
+  echo "  ⚠️  Smoke test inconclusive — check manually"
+fi
 
-scenario = get_scenario("diversion")
+# ── Get session ID for URL ───────────────────────────────
+SESSION=$(jupyter lab list 2>/dev/null | grep http | grep -o 'jupyter-hack-team-[^/]*' | head -1)
 
-async def test():
-    ctx, decision = await run_debate(
-        scenario["id"], scenario["telemetry"])
-    print(f"  ✅ Debate complete in {decision.elapsed_s:.1f}s")
-    print(f"  ✅ Decision: {decision.decision[:80]}...")
-    print(f"  ✅ Confidence: {decision.confidence}%")
-
-asyncio.run(test())
-PYEOF
-
-# ── Done ─────────────────────────────────────────────────
 echo ""
 echo "████████████████████████████████████████████████████"
 echo "  AEGIS IS READY"
 echo "████████████████████████████████████████████████████"
 echo ""
-echo "  UI:      http://localhost:8889/warroom_v4.html"
-echo "  Mistral: http://localhost:8001/health"
-echo "  Tiny:    http://localhost:8003/health"
+if [ ! -z "$SESSION" ]; then
+  echo "  LIVE UI:"
+  echo "  https://notebooks.amd.com/${SESSION}/proxy/7777/warroom_live.html"
+else
+  echo "  UI:  http://localhost:7777/warroom_live.html"
+  echo "  (Replace localhost with your Jupyter proxy URL)"
+fi
 echo ""
-echo "  rocm-smi output:"
-rocm-smi | grep -E "VRAM|GPU%|Device|===="
+echo "  Mistral:    http://localhost:8001/health"
+echo "  TinyLlama:  http://localhost:8003/health"
+echo "  API Server: http://localhost:8891/health"
 echo ""
-echo "  To run the full war room:"
-echo "  cd /workspace && python3 -c \""
-echo "  import asyncio,sys; sys.path.insert(0,'/workspace/aegis')"
-echo "  from serving.vllm_backend import install_vllm_backends"
-echo "  from orchestrator.engine import run_debate"
-echo "  from scenarios.library import get_scenario"
-echo "  \""
+rocm-smi | grep -E "VRAM|GPU%|===="
 echo ""
-echo "  Happy Hacking — Team-557 · Gagandeep Singh 🚀"
+echo "  Happy Hacking — Team-557 · Gagandeep Singh"
 echo ""

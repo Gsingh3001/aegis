@@ -1,1 +1,1428 @@
-404: Not Found
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AEGIS V4 — Enterprise Cyber Defense Framework</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#020408;--s1:rgba(10,16,28,0.97);--s2:rgba(15,22,35,0.9);
+  --border:#1a2535;--border2:#243347;
+  --cyan:#00d4ff;--cyan2:rgba(0,212,255,0.1);--cyan3:rgba(0,212,255,0.05);
+  --amber:#ffb800;--amber2:rgba(255,184,0,0.1);
+  --red:#ff3b3b;--red2:rgba(255,59,59,0.1);
+  --green:#00ff88;--green2:rgba(0,255,136,0.08);
+  --purple:#a855f7;--blue:#3b82f6;
+  --text:#e8f4f8;--dim:#7a9bb5;--faint:#3a5068;
+  --mono:'JetBrains Mono',monospace;--ui:'Rajdhani',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--ui);font-size:13px;
+  background-image:
+    radial-gradient(ellipse at 15% 0%,rgba(0,212,255,0.06) 0%,transparent 55%),
+    radial-gradient(ellipse at 85% 100%,rgba(168,85,247,0.04) 0%,transparent 55%),
+    repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,212,255,0.015) 39px,rgba(0,212,255,0.015) 40px),
+    repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,212,255,0.015) 39px,rgba(0,212,255,0.015) 40px);
+}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 3px);pointer-events:none;z-index:9990}
+
+/* ══ BOOT ══════════════════════════════════════════════════ */
+#boot{position:fixed;inset:0;background:#000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--mono)}
+.b-hex{width:70px;height:70px;border:2px solid var(--cyan);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:hpulse 2s ease-in-out infinite;box-shadow:0 0 40px rgba(0,212,255,0.2),inset 0 0 30px rgba(0,212,255,0.1)}
+@keyframes hpulse{0%,100%{box-shadow:0 0 20px rgba(0,212,255,0.2),inset 0 0 15px rgba(0,212,255,0.1)}50%{box-shadow:0 0 60px rgba(0,212,255,0.5),inset 0 0 40px rgba(0,212,255,0.25)}}
+.b-hex::after{content:'';width:24px;height:24px;background:var(--cyan);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);animation:spin 3s linear infinite;box-shadow:0 0 15px var(--cyan)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.b-title{font-family:var(--ui);font-size:36px;font-weight:700;letter-spacing:0.5em;color:#fff;text-align:center;margin-bottom:4px}
+.b-sub{font-family:var(--mono);font-size:10px;color:var(--cyan);letter-spacing:0.3em;text-transform:uppercase;text-align:center;margin-bottom:32px}
+.b-log{width:580px;font-size:11px;line-height:2.4;color:var(--cyan)}
+.b-line{opacity:0;animation:fin 0.05s forwards}
+@keyframes fin{to{opacity:1}}
+.bok{color:var(--green);margin-left:10px}
+.b-bar{width:580px;height:2px;background:rgba(255,255,255,0.05);margin-top:20px;overflow:hidden}
+.b-prog{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));width:0%;transition:width 0.25s ease;box-shadow:0 0 10px var(--cyan)}
+
+/* ══ HEADER ══════════════════════════════════════════════════ */
+header{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(2,4,8,0.98);border-bottom:1px solid rgba(0,212,255,0.25);position:relative;z-index:100;flex-shrink:0}
+header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0.4}
+.brand{display:flex;align-items:center;gap:12px}
+.bhex{width:28px;height:28px;border:1.5px solid var(--cyan);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px var(--cyan2)}
+.bhex::after{content:'';width:10px;height:10px;background:var(--cyan);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%)}
+.bname{font-size:18px;font-weight:700;letter-spacing:0.3em;color:#fff}
+.bsub{font-family:var(--mono);font-size:8px;color:var(--cyan);letter-spacing:0.2em;text-transform:uppercase;margin-top:1px}
+
+/* AMD ADVANTAGE COUNTER — Upgrade 1 */
+.amd-counter{display:flex;gap:0;border:1px solid rgba(0,212,255,0.2);background:rgba(0,0,0,0.6)}
+.amd-stat{padding:6px 14px;border-right:1px solid rgba(0,212,255,0.15);text-align:center;position:relative}
+.amd-stat:last-child{border:none}
+.amd-label{font-family:var(--mono);font-size:8px;color:var(--faint);text-transform:uppercase;letter-spacing:0.12em;display:block;margin-bottom:2px}
+.amd-val{font-family:var(--mono);font-size:13px;font-weight:700;display:block}
+.amd-val.cyan{color:var(--cyan);text-shadow:0 0 10px rgba(0,212,255,0.6)}
+.amd-val.green{color:var(--green);text-shadow:0 0 10px rgba(0,255,136,0.6)}
+.amd-val.amber{color:var(--amber);text-shadow:0 0 10px rgba(255,184,0,0.6);animation:ab 2s infinite}
+.amd-val.red{color:var(--red);text-shadow:0 0 10px rgba(255,59,59,0.8);animation:ab 0.8s infinite}
+.amd-val.impossible{color:var(--red);font-size:10px;text-shadow:0 0 10px rgba(255,59,59,0.8);animation:ab 1.5s infinite}
+@keyframes ab{0%,100%{opacity:1}50%{opacity:0.5}}
+.amd-badge{position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:ab 2s infinite}
+
+/* ══ PHASE BAR ══════════════════════════════════════════════ */
+.phasebar{height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0}
+.phases{display:flex;align-items:center;gap:0}
+.ph{display:flex;align-items:center;gap:6px;padding:0 12px;height:36px;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--faint);border-right:1px solid var(--border);transition:all 0.3s;cursor:default}
+.ph:last-child{border:none}
+.ph.active{color:var(--cyan);background:rgba(0,212,255,0.04)}
+.ph.done{color:var(--green)}
+.ph-n{width:16px;height:16px;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0}
+.ph.done .ph-n{background:var(--green);border-color:var(--green);color:#000}
+.ph.active .ph-n{animation:phblink 1.5s infinite}
+@keyframes phblink{0%,100%{box-shadow:0 0 0 0 rgba(0,212,255,0.4)}50%{box-shadow:0 0 0 3px rgba(0,212,255,0)}}
+.threat-right{display:flex;align-items:center;gap:10px}
+.thlbl{font-family:var(--mono);font-size:8px;color:var(--faint);text-transform:uppercase;letter-spacing:0.1em}
+.thwrap{width:160px;height:5px;background:#000;border:1px solid var(--border);overflow:hidden;border-radius:2px}
+.thfill{height:100%;background:linear-gradient(90deg,var(--green),var(--amber),var(--red));width:0%;transition:width 1.2s cubic-bezier(0.4,0,0.2,1)}
+.thpct{font-family:var(--mono);font-size:11px;color:var(--red);font-weight:700;min-width:36px;text-align:right}
+.clk{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--red);text-shadow:0 0 12px rgba(255,59,59,0.5);min-width:72px;text-align:right}
+
+/* ══ MAIN GRID ══════════════════════════════════════════════ */
+.main{display:grid;grid-template-columns:1fr 260px;grid-template-rows:1fr;height:calc(100vh - 90px);overflow:hidden}
+
+/* ══ LEFT — WAR ROOM + MAP ══════════════════════════════════ */
+.left{display:grid;grid-template-rows:1fr 220px;overflow:hidden;border-right:1px solid var(--border)}
+
+/* ══ AGENT PANELS ═══════════════════════════════════════════ */
+.warroom{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);overflow:hidden}
+.panel{background:var(--s1);display:flex;flex-direction:column;overflow:hidden;position:relative;transition:background 0.3s}
+.panel::before,.panel::after{content:'';position:absolute;width:10px;height:10px;pointer-events:none;z-index:2;transition:border-color 0.3s}
+.panel::before{top:0;left:0;border-top:1.5px solid var(--border2);border-left:1.5px solid var(--border2)}
+.panel::after{bottom:0;right:0;border-bottom:1.5px solid var(--border2);border-right:1.5px solid var(--border2)}
+.panel.active{background:rgba(0,212,255,0.03)}
+.panel.active::before,.panel.active::after{border-color:var(--cyan)}
+.panel.done::before,.panel.done::after{border-color:rgba(0,255,136,0.4)}
+.panel[data-r="SKEPTIC"].active{background:rgba(255,59,59,0.03)}
+.panel[data-r="SKEPTIC"].active::before,.panel[data-r="SKEPTIC"].active::after{border-color:var(--red)}
+.ph-head{display:flex;align-items:center;gap:7px;padding:7px 10px;background:rgba(0,0,0,0.4);border-bottom:1px solid var(--border)}
+.pdot{width:6px;height:6px;border-radius:50%;background:var(--faint);transition:all 0.3s;flex-shrink:0}
+.panel.active .pdot{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.panel[data-r="SKEPTIC"].active .pdot{background:var(--red);box-shadow:0 0 8px var(--red)}
+.panel.done .pdot{background:var(--green);box-shadow:0 0 6px var(--green)}
+.pname{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);flex:1;transition:color 0.3s}
+.panel.active .pname{color:var(--cyan)}
+.panel[data-r="SKEPTIC"].active .pname{color:var(--red)}
+.pbadge{font-size:8px;padding:1px 5px;border:1px solid var(--border2);color:var(--faint);letter-spacing:0.06em;text-transform:uppercase;font-family:var(--mono)}
+.pout{flex:1;padding:8px 10px;overflow-y:auto;font-family:var(--mono);font-size:10px;line-height:1.65;color:var(--faint);white-space:pre-wrap;word-break:break-word;transition:color 0.3s}
+.panel.active .pout{color:var(--text)}
+.pout::-webkit-scrollbar{width:2px}
+.pout::-webkit-scrollbar-thumb{background:var(--border2)}
+.pfoot{display:flex;justify-content:space-between;padding:4px 10px;background:rgba(0,0,0,0.5);border-top:1px solid var(--border);font-family:var(--mono);font-size:8px;color:var(--faint)}
+.cur{display:inline-block;width:6px;height:11px;background:var(--cyan);animation:cblink 0.9s step-end infinite;vertical-align:text-bottom;margin-left:2px}
+@keyframes cblink{0%,100%{opacity:1}50%{opacity:0}}
+.panel[data-r="SKEPTIC"].active .cur{background:var(--red)}
+
+/* ══ SPLIT SCREEN KILL SHOT — Upgrade 3 ══════════════════════ */
+.splitrow{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);overflow:hidden}
+.split-panel{background:var(--s1);display:flex;flex-direction:column;overflow:hidden}
+.split-head{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--border)}
+.split-head.bad{background:rgba(255,59,59,0.08);border-bottom-color:rgba(255,59,59,0.3)}
+.split-head.good{background:rgba(0,255,136,0.05);border-bottom-color:rgba(0,255,136,0.2)}
+.split-title{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase}
+.split-head.bad .split-title{color:var(--red)}
+.split-head.good .split-title{color:var(--green)}
+.split-verdict{font-family:var(--mono);font-size:8px;padding:2px 8px;border:1px solid;font-weight:700;letter-spacing:0.1em}
+.split-head.bad .split-verdict{border-color:var(--red);color:var(--red)}
+.split-head.good .split-verdict{border-color:var(--green);color:var(--green)}
+.split-out{flex:1;padding:8px 12px;overflow-y:auto;font-family:var(--mono);font-size:10px;line-height:1.7;color:var(--dim);white-space:pre-wrap}
+.split-out.bad .highlight{color:var(--red);font-weight:700}
+.split-out.good .highlight{color:var(--green);font-weight:700}
+.split-out::-webkit-scrollbar{width:2px}
+.split-out::-webkit-scrollbar-thumb{background:var(--border2)}
+
+/* ══ SIDEBAR ═════════════════════════════════════════════════ */
+.sidebar{display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;background:var(--s1)}
+.sidebar::-webkit-scrollbar{width:2px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2)}
+.sb{padding:12px 14px;border-bottom:1px solid var(--border);position:relative}
+.sb::before{content:'';position:absolute;top:0;left:0;width:2px;height:100%;background:var(--cyan);opacity:0.3}
+.sbt{font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.18em;color:var(--cyan);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.sbt::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(0,212,255,0.3),transparent)}
+
+/* ══ ATTACK MAP — Upgrade 2 ══════════════════════════════════ */
+.mapwrap{position:relative;background:#000;border:1px solid var(--border);overflow:hidden}
+#netmap{display:block;width:100%}
+.map-legend{display:flex;gap:10px;padding:4px 8px;background:rgba(0,0,0,0.8);border-top:1px solid var(--border)}
+.leg-item{display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:8px;color:var(--dim)}
+.leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* ══ SWARM — Upgrade 4 ══════════════════════════════════════ */
+.swarm-grid{display:grid;grid-template-columns:repeat(15,1fr);gap:2px;background:#000;border:1px solid var(--border);padding:5px}
+.sn{height:7px;background:var(--border2);border-radius:1px;transition:all 0.15s}
+.sn.a{background:var(--cyan);box-shadow:0 0 4px var(--cyan);opacity:0.9}
+.sn.ok{background:var(--green);opacity:0.6}
+.sn.fail{background:var(--red);box-shadow:0 0 5px var(--red);opacity:1}
+.swarm-result{font-family:var(--mono);font-size:18px;font-weight:700;text-align:center;margin-top:6px}
+.swarm-result.good{color:var(--green);text-shadow:0 0 10px rgba(0,255,136,0.5)}
+.swarm-result.warn{color:var(--amber);text-shadow:0 0 10px rgba(255,184,0,0.5)}
+
+/* ══ BREACH CARDS — Upgrade 4 ═══════════════════════════════ */
+.breach-cards{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.bc{background:#000;border:1px solid rgba(255,59,59,0.25);padding:8px 10px;position:relative}
+.bc::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:var(--red)}
+.bc-tech{font-family:var(--mono);font-size:10px;color:var(--red);font-weight:700;margin-bottom:2px}
+.bc-att{font-family:var(--mono);font-size:8px;color:var(--amber);margin-bottom:2px}
+.bc-why{font-family:var(--mono);font-size:9px;color:var(--dim);line-height:1.4}
+.bc-fix{font-family:var(--mono);font-size:9px;color:var(--green);margin-top:3px}
+
+/* ══ COUNTERFACTUAL TIMELINE ═══════════════════════════════ */
+.timeline{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}
+.tl-col{padding:8px;background:#000;border:1px solid}
+.tl-col.bad{border-color:rgba(255,59,59,0.3)}
+.tl-col.good{border-color:rgba(0,255,136,0.25)}
+.tl-label{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px;font-weight:700}
+.tl-col.bad .tl-label{color:var(--red)}
+.tl-col.good .tl-label{color:var(--green)}
+.tl-item{font-family:var(--mono);font-size:9px;color:var(--dim);margin-bottom:4px;padding-left:10px;position:relative;line-height:1.4}
+.tl-item::before{content:'›';position:absolute;left:0;color:var(--faint)}
+.tl-cost{font-family:var(--mono);font-size:12px;font-weight:700;text-align:center;margin-top:6px;padding:4px}
+.tl-col.bad .tl-cost{color:var(--red);text-shadow:0 0 8px rgba(255,59,59,0.4)}
+.tl-col.good .tl-cost{color:var(--green);text-shadow:0 0 8px rgba(0,255,136,0.4)}
+
+/* ══ MISC ELEMENTS ══════════════════════════════════════════ */
+.sc-btn{width:100%;padding:6px 10px;background:rgba(0,0,0,0.5);border:1px solid var(--border2);color:var(--dim);font-family:var(--mono);font-size:10px;cursor:pointer;text-align:left;transition:all 0.2s;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.sc-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.sc-btn.active{border-color:var(--cyan);color:var(--cyan);background:var(--cyan3)}
+.sc-dot{width:5px;height:5px;border-radius:50%;background:var(--faint);flex-shrink:0}
+.sc-btn.active .sc-dot{background:var(--cyan);box-shadow:0 0 5px var(--cyan)}
+.inj{width:100%;background:#000;border:1px solid var(--border2);color:var(--cyan);font-family:var(--mono);font-size:10px;padding:7px;resize:none;height:60px;outline:none}
+.inj:focus{border-color:var(--cyan)}
+.inj::placeholder{color:var(--faint)}
+.btn{font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:8px 14px;border:1px solid transparent;cursor:pointer;width:100%;transition:all 0.2s;margin-bottom:5px;overflow:hidden;position:relative}
+.btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);transform:translateX(-100%);transition:transform 0.4s}
+.btn:hover::after{transform:translateX(100%)}
+.btn:disabled{opacity:0.3;cursor:not-allowed}
+.btn-go{background:var(--cyan);color:#000;box-shadow:0 0 20px rgba(0,212,255,0.25)}
+.btn-go:hover:not(:disabled){box-shadow:0 0 35px rgba(0,212,255,0.5)}
+.btn-kill{background:var(--red2);border-color:var(--red);color:var(--red)}
+.btn-kill:hover{background:var(--red);color:#fff}
+.btn-ghost{background:rgba(0,0,0,0.5);border-color:var(--border2);color:var(--dim)}
+.btn-ghost:hover{border-color:var(--cyan);color:var(--cyan)}
+.ledger{background:#000;border:1px solid var(--border2);padding:6px;max-height:110px;overflow-y:auto;font-family:var(--mono);font-size:9px}
+.ledger::-webkit-scrollbar{width:2px}
+.le{padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--dim)}
+.le-hash{color:var(--cyan);font-size:8px}
+.le-ok{color:var(--green);font-size:8px}
+.nist-row{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:6px}
+.ns{padding:5px 3px;background:rgba(0,0,0,0.5);border:1px solid var(--border2);text-align:center;font-family:var(--mono);font-size:7px;color:var(--faint);text-transform:uppercase;letter-spacing:0.05em;transition:all 0.3s}
+.ns.active{border-color:var(--cyan);color:var(--cyan);background:var(--cyan3)}
+.ns.done{border-color:rgba(0,255,136,0.3);color:var(--green);background:var(--green2)}
+.ns-n{font-size:12px;font-weight:700;display:block}
+.vault-bar{display:flex;align-items:center;gap:7px;padding:6px 8px;background:#000;border:1px solid rgba(0,255,136,0.2);margin-top:4px}
+.vled{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:ab 2s infinite}
+
+/* ══ OVERLAY ════════════════════════════════════════════════ */
+#overlay{display:none;position:fixed;inset:0;background:rgba(2,4,8,0.96);backdrop-filter:blur(10px);z-index:500;overflow-y:auto;padding:24px 16px}
+#overlay.open{display:flex;align-items:flex-start;justify-content:center}
+.dos{background:linear-gradient(160deg,rgba(12,20,35,1),rgba(2,4,8,1));border:1px solid var(--amber);box-shadow:0 0 100px rgba(255,184,0,0.12);width:100%;max-width:980px;margin:auto;position:relative}
+.dos::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--amber),transparent);box-shadow:0 0 20px var(--amber)}
+.dos-h{display:flex;justify-content:space-between;align-items:flex-start;padding:20px 24px 16px;border-bottom:1px solid rgba(255,184,0,0.15)}
+.dos-t .ey{font-family:var(--mono);font-size:8px;color:var(--faint);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:5px}
+.dos-t .ti{font-size:20px;font-weight:700;color:var(--amber);letter-spacing:0.1em;text-transform:uppercase}
+.dos-tags{display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+.tag{font-family:var(--mono);font-size:8px;padding:3px 9px;border:1px solid;letter-spacing:0.1em;font-weight:700}
+.tag.crit{background:var(--red2);border-color:var(--red);color:var(--red)}
+.tag.conf{background:var(--amber2);border-color:var(--amber);color:var(--amber)}
+.tag.seal{background:var(--green2);border-color:var(--green);color:var(--green)}
+.dos-b{padding:20px 24px}
+.cos-chain{background:#000;border:1px solid rgba(0,255,136,0.2);padding:10px;margin-bottom:16px}
+.cos-title{font-family:var(--mono);font-size:8px;color:var(--green);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px}
+.ci{display:flex;gap:10px;margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,0.03);font-family:var(--mono);font-size:9px}
+.ci-hash{color:var(--cyan);flex:1}
+.ci-st{color:var(--green)}
+.dos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
+.dc{padding:14px;border:1px solid var(--border2);background:rgba(0,0,0,0.5)}
+.dc::before{content:'';display:block;height:2px;margin:-14px -14px 10px}
+.dc.tech::before{background:var(--cyan)}
+.dc.vault::before{background:var(--green)}
+.dc.legal::before{background:var(--amber)}
+.dc.comms::before{background:var(--blue)}
+.dc-t{font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px}
+.dc.tech .dc-t{color:var(--cyan)}
+.dc.vault .dc-t{color:var(--green)}
+.dc.legal .dc-t{color:var(--amber)}
+.dc.comms .dc-t{color:var(--blue)}
+.dc ul{list-style:none;font-family:var(--mono);font-size:10px;color:var(--text);line-height:1.6}
+.dc ul li{padding-left:12px;position:relative;margin-bottom:6px}
+.dc ul li::before{content:'›';position:absolute;left:0;color:var(--faint)}
+.dc ul li strong{color:#fff}
+.dissent{background:var(--red2);border:1px solid rgba(255,59,59,0.25);padding:10px;font-family:var(--mono);font-size:10px;margin-bottom:12px}
+.dissent-lbl{font-size:8px;color:var(--red);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:5px}
+.dos-foot{display:flex;gap:10px;padding:14px 24px;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<!-- BOOT -->
+<div id="boot">
+  <div class="b-hex"></div>
+  <div class="b-title">AEGIS</div>
+  <div class="b-sub">Enterprise Cyber Defense Framework · v4.0 · AMD MI300X</div>
+  <div class="b-log" id="blog"></div>
+  <div class="b-bar"><div class="b-prog" id="bprog"></div></div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="brand">
+    <div class="bhex"></div>
+    <div>
+      <div class="bname">AEGIS</div>
+      <div class="bsub">Zero Trust · Neural Orchestration · 6-Agent Swarm</div>
+    </div>
+  </div>
+  <!-- AMD ADVANTAGE COUNTER — UPGRADE 1 -->
+  <div class="amd-counter">
+    <div class="amd-stat">
+      <div class="amd-badge"></div>
+      <span class="amd-label">HBM3 Used</span>
+      <span class="amd-val cyan" id="ac-vram">0 / 192 GB</span>
+    </div>
+    <div class="amd-stat">
+      <span class="amd-label">Models Live</span>
+      <span class="amd-val green" id="ac-models">0 resident</span>
+    </div>
+    <div class="amd-stat">
+      <span class="amd-label">Tokens/sec</span>
+      <span class="amd-val cyan" id="ac-tps">0 t/s</span>
+    </div>
+    <div class="amd-stat">
+      <span class="amd-label">Concurrent Streams</span>
+      <span class="amd-val amber" id="ac-streams">0</span>
+    </div>
+    <div class="amd-stat" style="background:rgba(255,59,59,0.04)">
+      <span class="amd-label">NVIDIA H100 (80GB)</span>
+      <span class="amd-val impossible" id="ac-nvidia">INSUFFICIENT VRAM</span>
+    </div>
+  </div>
+</header>
+
+<!-- PHASE BAR -->
+<div class="phasebar">
+  <div class="phases">
+    <div class="ph active" id="ph0"><div class="ph-n">I</div>Evidence Capture</div>
+    <div class="ph" id="ph1"><div class="ph-n">II</div>TTP Mapping</div>
+    <div class="ph" id="ph2"><div class="ph-n">III</div>Adversarial Gate</div>
+    <div class="ph" id="ph3"><div class="ph-n">IV</div>BCP Auth</div>
+    <div class="ph" id="ph4"><div class="ph-n">V</div>Swarm Validate</div>
+  </div>
+  <div class="threat-right">
+    <span class="thlbl">Blast Radius</span>
+    <div class="thwrap"><div class="thfill" id="thfill"></div></div>
+    <span class="thpct" id="thpct">0%</span>
+    <span class="clk" id="clk">00:00:00</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="left">
+
+    <!-- 5 AGENT PANELS -->
+    <div class="warroom">
+      <div class="panel" data-r="FORENSICS" id="panel-FORENSICS">
+        <div class="ph-head"><div class="pdot" id="dot-FORENSICS"></div><div class="pname">Forensics</div><div class="pbadge">Evidence</div></div>
+        <div class="pout" id="out-FORENSICS">AWAITING INIT...</div>
+        <div class="pfoot"><span id="tok-FORENSICS">0T</span><span>CoC</span></div>
+      </div>
+      <div class="panel" data-r="RED" id="panel-RED">
+        <div class="ph-head"><div class="pdot" id="dot-RED"></div><div class="pname">Red Team</div><div class="pbadge">TTP</div></div>
+        <div class="pout" id="out-RED">STANDBY...</div>
+        <div class="pfoot"><span id="tok-RED">0T</span><span>ATT&CK</span></div>
+      </div>
+      <div class="panel" data-r="BLUE" id="panel-BLUE">
+        <div class="ph-head"><div class="pdot" id="dot-BLUE"></div><div class="pname">Inf. Defense</div><div class="pbadge">Contain</div></div>
+        <div class="pout" id="out-BLUE">MATRIX READY.</div>
+        <div class="pfoot"><span id="tok-BLUE">0T</span><span>BCP</span></div>
+      </div>
+      <div class="panel" data-r="SKEPTIC" id="panel-SKEPTIC">
+        <div class="ph-head"><div class="pdot" id="dot-SKEPTIC"></div><div class="pname">Skeptic</div><div class="pbadge">Dissent</div></div>
+        <div class="pout" id="out-SKEPTIC">MONITORING...</div>
+        <div class="pfoot"><span id="tok-SKEPTIC">0T</span><span>Gate</span></div>
+      </div>
+      <div class="panel" data-r="CISO" id="panel-CISO">
+        <div class="ph-head"><div class="pdot" id="dot-CISO"></div><div class="pname">CISO</div><div class="pbadge">Risk</div></div>
+        <div class="pout" id="out-CISO">AWAITING...</div>
+        <div class="pfoot"><span id="tok-CISO">0T</span><span>Legal</span></div>
+      </div>
+    </div>
+
+    <!-- SPLIT SCREEN KILL SHOT — UPGRADE 3 -->
+    <div class="splitrow">
+      <div class="split-panel">
+        <div class="split-head bad">
+          <div class="split-title">Single Model (Baseline)</div>
+          <div class="split-verdict" id="sv-bad">AWAITING...</div>
+        </div>
+        <div class="split-out bad" id="split-bad">Single model analysis will run here in parallel — showing where it goes wrong in real time...</div>
+      </div>
+      <div class="split-panel">
+        <div class="split-head good">
+          <div class="split-title">AEGIS War Room (6 Agents)</div>
+          <div class="split-verdict" id="sv-good">AWAITING...</div>
+        </div>
+        <div class="split-out good" id="split-good">War room consensus will appear here — showing the correct catch in real time...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- AMD LIVE STATS -->
+    <div class="sb" style="background:rgba(0,0,0,0.4)">
+      <div class="sbt" style="color:var(--cyan)">AMD MI300X Live</div>
+      <div style="font-family:var(--mono);font-size:9px;line-height:2;color:var(--dim)">
+        <div>HBM3 Bandwidth: <span style="color:var(--cyan)" id="s-bw">0 TB/s</span></div>
+        <div>KV Cache Used: <span style="color:var(--cyan)" id="s-kv">0 GB</span></div>
+        <div>Batch Size: <span style="color:var(--amber)" id="s-batch">0</span></div>
+        <div>GDPR Clock: <span style="color:var(--red)" id="s-gdpr">INACTIVE</span></div>
+      </div>
+    </div>
+
+    <!-- NETWORK MAP — UPGRADE 2 -->
+    <div class="sb">
+      <div class="sbt">Attack Propagation Map</div>
+      <div class="mapwrap">
+        <canvas id="netmap" height="170"></canvas>
+      </div>
+      <div class="map-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:#3a5068"></div>Clean</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--amber)"></div>Suspicious</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>Compromised</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Contained</div>
+      </div>
+    </div>
+
+    <!-- NIST -->
+    <div class="sb">
+      <div class="sbt">NIST SP 800-61</div>
+      <div class="nist-row">
+        <div class="ns active" id="n0"><span class="ns-n">I</span>Prep</div>
+        <div class="ns" id="n1"><span class="ns-n">II</span>Detect</div>
+        <div class="ns" id="n2"><span class="ns-n">III</span>Contain</div>
+        <div class="ns" id="n3"><span class="ns-n">IV</span>Eradicate</div>
+        <div class="ns" id="n4"><span class="ns-n">V</span>Recover</div>
+      </div>
+    </div>
+
+    <!-- CHAIN OF CUSTODY -->
+    <div class="sb">
+      <div class="sbt">Chain of Custody</div>
+      <div class="ledger" id="ledger"><div style="color:var(--faint);font-size:9px">Awaiting forensic capture...</div></div>
+    </div>
+
+    <!-- VAULT -->
+    <div class="sb">
+      <div class="sbt">Air-Gapped Vault</div>
+      <div class="vault-bar">
+        <div class="vled"></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--green)">OFFLINE · SHA-256 VERIFIED</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:8px;color:var(--faint);margin-top:5px;line-height:1.7">
+        Last sync: <span style="color:var(--green)">06:00 UTC</span><br>
+        Restore risk: <span id="vrisk" style="color:var(--amber)">ASSESSING...</span>
+      </div>
+    </div>
+
+    <!-- SCENARIOS -->
+    <div class="sb">
+      <div class="sbt">Scenarios</div>
+      <button class="sc-btn active" id="sc-diversion" onclick="sel('diversion')"><div class="sc-dot"></div>The Diversion (Hero)</button>
+      <button class="sc-btn" id="sc-infra" onclick="sel('infra')"><div class="sc-dot"></div>Infrastructure Hijack</button>
+      <button class="sc-btn" id="sc-ransomware" onclick="sel('ransomware')"><div class="sc-dot"></div>Ransomware + Vault</button>
+    </div>
+
+    <!-- INJECT -->
+    <div class="sb">
+      <div class="sbt">Live Injection</div>
+      <textarea class="inj" id="inj" placeholder="> Paste APT telemetry..."></textarea>
+      <button class="btn btn-ghost" onclick="useCustom()" style="font-size:10px;padding:5px;margin-bottom:0">Inject</button>
+    </div>
+
+    <!-- LAUNCH -->
+    <div class="sb">
+      <button class="btn btn-go" id="btnrun" onclick="run()">▶ Launch War Room</button>
+      <button class="btn btn-kill" id="btnab" onclick="showKS()" style="display:none">⚡ Kill Shot Comparison</button>
+      <button class="btn btn-ghost" onclick="resetAll()">↺ Reset</button>
+    </div>
+
+    <!-- SWARM — UPGRADE 4 -->
+    <div class="sb" id="swarm-sb" style="display:none">
+      <div class="sbt" style="color:var(--amber)">Config Mutation Swarm</div>
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:8px;color:var(--faint);margin-bottom:4px">
+        <span id="sw-count">0/120</span><span id="sw-time"></span>
+      </div>
+      <div class="swarm-grid" id="sw-grid"></div>
+      <div class="swarm-result" id="sw-result" style="display:none"></div>
+      <!-- BREACH CARDS — UPGRADE 4 -->
+      <div class="breach-cards" id="breach-cards"></div>
+    </div>
+
+    <!-- COUNTERFACTUAL TIMELINE -->
+    <div class="sb" id="tl-sb" style="display:none">
+      <div class="sbt" style="color:var(--amber)">Counterfactual Timeline</div>
+      <div class="timeline">
+        <div class="tl-col bad">
+          <div class="tl-label">Single Model Path</div>
+          <div class="tl-item">T+4min: HOST-A isolated</div>
+          <div class="tl-item">T+18min: Exfil completes</div>
+          <div class="tl-item">T+22min: Breach confirmed</div>
+          <div class="tl-item">T+48hr: GDPR notification</div>
+          <div class="tl-cost" id="tl-bad-cost">£47M+</div>
+        </div>
+        <div class="tl-col good">
+          <div class="tl-label">AEGIS Path</div>
+          <div class="tl-item">T+3min: HOST-F blocked</div>
+          <div class="tl-item">T+3min: Exfil stopped</div>
+          <div class="tl-item">T+15min: Vault secured</div>
+          <div class="tl-item">T+15min: No notification</div>
+          <div class="tl-cost" id="tl-good-cost">£0</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DECISION OVERLAY -->
+<div id="overlay">
+  <div class="dos">
+    <div class="dos-h">
+      <div class="dos-t">
+        <div class="ey">Classified // Eyes Only // AEGIS Lifecycle Execution Artifact</div>
+        <div class="ti">Incident Commander Decision</div>
+      </div>
+      <div class="dos-tags">
+        <span class="tag crit">SEVERITY: CRITICAL</span>
+        <span class="tag conf" id="dos-conf">CONFIDENCE: 82%</span>
+        <span class="tag seal">LEDGER: SEALED</span>
+      </div>
+    </div>
+    <div class="dos-b">
+      <div class="cos-chain" id="dos-chain">
+        <div class="cos-title">Evidence Chain of Custody — Immutable Ledger</div>
+      </div>
+      <div id="dos-content"></div>
+      <div class="dissent" id="dos-dissent">
+        <div class="dissent-lbl">Recorded Dissent (Skeptic)</div>
+        <div id="dissent-txt"></div>
+      </div>
+    </div>
+    <div class="dos-foot">
+      <button class="btn btn-kill" style="width:auto;padding:7px 18px;margin:0" onclick="commitLog()">Commit to IR Log</button>
+      <button class="btn btn-ghost" style="width:auto;padding:7px 18px;margin:0" onclick="dismissRun()">Dismiss & Run Swarm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ SCENARIO DATA ════════════════════════════════════════════
+const SC = {
+diversion:{
+  id:'INC-2024-001',name:'THE DIVERSION',desc:'Loud scan masking live DNS exfil',
+  chain:[
+    {hash:'SHA-256:a4f2c8e1...9e1b3d',artifact:'Memory dump HOST-F 10:17 UTC'},
+    {hash:'SHA-256:7d3e9124...2c4a8f',artifact:'PCAP 10:09-10:17 UTC'},
+    {hash:'SHA-256:b9c1e7a3...4f2d0e',artifact:'Auth logs svc-prod-7'}
+  ],
+  agents:{
+    FORENSICS:`FORENSIC SITREP — CHAIN OF CUSTODY INITIATED
+━━━━━━━━━━━━━━━━━━━━━━━━
+OBSERVED: 847 port-scan events HOST-A→DMZ 10:14-10:17 UTC
+  SIEM Score: 92 | CONFIDENCE: 100%
+OBSERVED: DNS queries HOST-F→203.0.113.7
+  Rate: 2/min | Subdomain entropy: HIGH | DNS Tunnel | SIEM: 31
+  Start: 10:09 UTC — 5min BEFORE scan | CONF: 87%
+OBSERVED: svc-prod-7 auth to HOST-F at 10:09 UTC
+  Normal scope: HOST-B, HOST-C only | CONF: 100%
+EVIDENCE HASHED & LOCKED:
+  HOST-F memory: SHA-256:a4f2c8...9e1b [IMMUTABLE]
+  PCAP 10:09-17: SHA-256:7d3e91...2c4a [IMMUTABLE]
+⚠ HOST-F activity PREDATES port scan by 5 minutes.
+  The scan is masking the real exfil channel.`,
+    RED:`ATT&CK TTP CHAIN:
+━━━━━━━━━━━━━━━━━━━━━━━━
+→ T1046  Net Service Scan — HOST-A [NOISE]
+→ T1036  Masquerading — Scan as diversion
+→ T1071.004 DNS Tunnel — HOST-F ← PRIMARY VECTOR
+→ T1078  Valid Accounts — svc-prod-7 abuse
+→ T1041  Exfil over C2 — Active NOW
+ACTOR: Deliberate diversion. High OPSEC.
+Pre-positioned access via svc-prod-7.
+PREDICTED NEXT: Exfil completes ~10:45.
+Then: Persistence on HOST-F kernel level.
+TIMELINE: 18 minutes remaining.`,
+    BLUE:`CONTAINMENT MATRIX:
+━━━━━━━━━━━━━━━━━━━━━━━━
+→ CRITICAL: Block HOST-F DNS→203.0.113.7
+  Method: Firewall ACL | Impact: ZERO | Time: 90s
+→ HIGH: Isolate HOST-F from VLAN 42
+  Impact: Finance offline 45min
+→ HOLD: Revoke svc-prod-7 (15min blind-spot audit first)
+→ MONITOR HOST-A — do NOT isolate
+  Isolating HOST-A tips off attacker
+BCP: Vault pre-incident integrity CLEAN
+Config drift scan: INITIATED`,
+    SKEPTIC:`ADVERSARIAL GATE — CHALLENGE:
+━━━━━━━━━━━━━━━━━━━━━━━━
+CHALLENGE 1: svc-prod-7 authed at 10:09.
+We have a 9-minute blind spot 10:00-10:09.
+Data may already be staged on HOST-G or HOST-H.
+CHALLENGE 2: Revoking creds NOW signals
+detection. Attacker drops emergency persistence.
+CHALLENGE 3: HOST-F is finance-reporting.
+If Q4 earnings accessed — MAR implications.
+ARCH DRIFT: 3/120 Kubernetes config hashes
+MISMATCHED. CI/CD pipeline: UNVERIFIED.
+WHAT WE'RE MISSING: Check HOST-G/H for
+svc-prod-7 lateral auth before any action.`,
+    CISO:`EXECUTIVE RISK BRIEF:
+━━━━━━━━━━━━━━━━━━━━━━━━
+COST MATRIX:
+  HOST-F isolation: £0, 200 users 45min
+  Full lockdown: £2.3M/hr — NOT recommended
+GDPR Art.33: HOST-F = finance + PII
+  72-HOUR CLOCK: STARTED NOW
+  MAR: Q4 earnings risk — legal hold OPEN
+BCP: Vault integrity CLEAN (pre-incident)
+  Option A (restore): LOW risk
+  Option B (rebuild IaC): PREFERRED
+MY VOTE: Block HOST-F immediately.
+  Delay cred revoke 15min for HOST-G audit.`
+  },
+  commander:`═══════════════════════════════════════
+INCIDENT COMMANDER DECISION
+═══════════════════════════════════════
+DECISION:
+(1) Block HOST-F DNS to 203.0.113.7 — IMMEDIATE
+(2) Isolate HOST-F VLAN 42 — IMMEDIATE
+(3) Audit HOST-G/H for svc-prod-7 auth — 15 MIN
+(4) Revoke svc-prod-7 after audit — 15 MIN
+(5) HOST-A: MONITOR ONLY — STANDING ORDER
+(6) IaC clean-room rebuild — PARALLEL
+
+RATIONALE: HOST-F DNS tunnel is live exfil.
+Stop the bleed first. Skeptic's 9-min blind
+spot flag is valid. IaC drift unresolved.
+
+NOT DOING: Not isolating HOST-A (tips attacker).
+Not restoring backup until IaC hashes verified.
+
+RECORDED DISSENT: Skeptic (conf 0.7) —
+full exfil scope unknown. HOST-G at risk.
+
+CONFIDENCE: 82%
+NEXT REVIEW: 15 min or HOST-G/H activity.
+═══════════════════════════════════════`,
+  dissent:`Skeptic (confidence 0.70) — Full exfil scope unknown. svc-prod-7 blind spot 10:00-10:09 may mean HOST-G/H already compromised. IaC hash mismatch on 3 nodes indicates possible pre-positioned hypervisor backdoor. Restoring any backup without full rebuild carries residual risk.`,
+  single_model:`SINGLE MODEL ANALYSIS:
+━━━━━━━━━━━━━━━━━━━━
+Threat detected: Mass port scan from HOST-A
+SIEM Score 92 — highest priority alert.
+Recommendation: Isolate HOST-A immediately
+to stop the scan and prevent further
+lateral movement.
+Block port scan range on DMZ firewall.
+Rotate credentials for affected systems.
+Monitor for further scanning activity.
+VERDICT: Contain HOST-A — threat neutralised.`,
+  single_miss:`OUTCOME: BREACH SUCCEEDED
+━━━━━━━━━━━━━━━━━━━━
+HOST-A isolated. But HOST-F DNS tunnel
+continued for 18 more minutes undetected.
+4.7GB customer PII exfiltrated.
+2.3M records now in attacker hands.
+GDPR notification required.
+Estimated breach cost: £47M+`,
+  aegis_win:`OUTCOME: EXFIL STOPPED
+━━━━━━━━━━━━━━━━━━━━
+Forensics: HOST-F DNS predates scan by 5min.
+Skeptic: Port scan is the decoy.
+Commander: Block HOST-F first — DONE T+3min.
+DNS tunnel severed. 0 records exfiltrated.
+Chain of custody preserved.
+Breach cost: £0. No GDPR notification.`,
+  map_events:[
+    {t:500,host:'JUMPSERVER',state:'warn'},
+    {t:1200,host:'WORKSTATION047',state:'red'},
+    {t:2000,host:'HOST-F',state:'red'},
+    {t:2800,host:'HOST-A',state:'warn'},
+    {t:4000,host:'HOST-F',state:'green'},
+    {t:5000,host:'WORKSTATION047',state:'green'},
+  ],
+  artifact_html:`<div class="dos-grid"><div class="dc tech"><div class="dc-t">Technical Containment</div><ul><li><strong>BLOCK</strong> HOST-F DNS→203.0.113.7 immediately</li><li><strong>ISOLATE</strong> HOST-F from VLAN 42</li><li><strong>MONITOR</strong> HOST-A without isolation</li><li><strong>AUDIT</strong> HOST-G/H for svc-prod-7 auth</li></ul></div><div class="dc vault"><div class="dc-t">BCP & Recovery</div><ul><li><strong>VERIFY</strong> IaC config hashes vs vault baseline</li><li><strong>INITIATE</strong> clean-room IaC rebuild</li><li><strong>DO NOT</strong> restore from backup until drift resolved</li><li><strong>VALIDATE</strong> 120 infrastructure states</li></ul></div><div class="dc legal"><div class="dc-t">Legal & Compliance</div><ul><li><strong>GDPR</strong> Art.33 72-hour clock — DPA notified</li><li><strong>MAR</strong> assessment — Q4 earnings exposure TBD</li><li><strong>HOLD</strong> external notification pending scope</li><li><strong>PRESERVE</strong> evidence chain of custody</li></ul></div><div class="dc comms"><div class="dc-t">Credentials & Comms</div><ul><li><strong>REVOKE</strong> svc-prod-7 after HOST-G/H audit T+15</li><li><strong>ROTATE</strong> all IaC secrets and CI/CD tokens</li><li><strong>INTERNAL</strong> comms via secure enclave only</li><li><strong>PREPARE</strong> degradation notice — hold publication</li></ul></div></div>`,
+  breach_vectors:[
+    {tech:'DNS-over-HTTPS (DoH) bypass',att:'T1048.003',why:'Firewall blocks port 53 but HTTPS CDN egress is open — exfil continues on port 443',fix:'Add DoH blocking + SSL inspection on CDN egress'},
+    {tech:'svc-prod-7-bak shadow account',att:'T1078.002',why:'Backup service account created at 09:58 not covered by revocation order',fix:'Enumerate ALL svc-prod-* accounts and revoke in bulk'},
+    {tech:'Scheduled task persistence survives isolation',att:'T1053.005',why:'HOST-F isolation is temporary — reconnection re-activates dormant task',fix:'Full reimaging of HOST-F after forensic capture'},
+  ]
+},
+infra:{
+  id:'INC-2026-X91',name:'INFRA HIJACK',desc:'IaC drift + hypervisor persistence',
+  chain:[
+    {hash:'SHA-256:f3a9c1e8...8e2d44',artifact:'BGP config delta snapshot'},
+    {hash:'SHA-256:2b7e44a9...9f1a2c',artifact:'Kubernetes manifests all 120 nodes'},
+    {hash:'SHA-256:c8d2b3f1...4a7f9e',artifact:'CI/CD pipeline audit log'}
+  ],
+  agents:{
+    FORENSICS:`FORENSIC SITREP — CRITICAL INFRASTRUCTURE
+━━━━━━━━━━━━━━━━━━━━━━━━
+OBSERVED: SHA-256 MISMATCH — Core-BGP config
+  Ref: 0x9f4e912c | Current: 0x3a7b2211 | 100%
+OBSERVED: 12/120 Kubernetes node hash mismatches
+  API gateway, auth service, logging pipeline
+  Pattern: selective — attacker knows critical paths
+OBSERVED: CI/CD rogue commit 02:17 UTC
+  service-deploy-bot credentials stolen
+  Payload: reverse shell in config-sync container
+EVIDENCE LOCKED:
+  BGP delta: SHA-256:f3a9c1...8e2d [IMMUTABLE]
+  K8s manifests: SHA-256:2b7e44...9f1a [IMMUTABLE]
+⚠ CRITICAL: Standard rollback re-injects backdoor.`,
+    RED:`INFRA ATT&CK MAPPING:
+━━━━━━━━━━━━━━━━━━━━━━━━
+→ T1195.002 Supply Chain: CI/CD compromise
+→ T1562.001 Impair Defenses: Logging disabled
+→ T1490    Inhibit Recovery: Backup targeted
+→ T1078.004 Cloud service account abuse
+→ T1601    Modify System Image: Router firmware
+ACTOR: Nation-state TTPs. Pre-positioned 6+ weeks.
+Living-off-the-land across full stack.
+PREDICTED NEXT: Dormant payload activates at
+next CI/CD deployment cycle.
+TIMELINE: Hours to full activation.`,
+    BLUE:`INFRA DEFENSE DIRECTIVE:
+━━━━━━━━━━━━━━━━━━━━━━━━
+→ CRITICAL: Stop all CI/CD deployments NOW
+  Impact: Dev freeze 24hr
+→ CRITICAL: Isolate BGP nodes to OOB management
+→ HIGH: Rebuild K8s from clean IaC source
+  NOT from current state — pre-taint commit only
+→ HIGH: Rotate ALL service account creds globally
+→ BCP: Option B — clean-room IaC on air-gapped infra
+  DO NOT use backup — may contain dormant payload`,
+    SKEPTIC:`INFRA DRIFT CHALLENGE:
+━━━━━━━━━━━━━━━━━━━━━━━━
+CHALLENGE: Rollback is a trap. Hypervisor
+backdoor survives restore from backup.
+Only clean rebuild from source IaC is safe.
+CHALLENGE: Is the source repo itself clean?
+Verify CI/CD signing keys. 6 weeks of access
+means every commit may be suspect.
+CHALLENGE: Logging pipeline is compromised.
+We may be missing lateral movement evidence.
+WHAT WE'RE MISSING: BGP prefix announcements.
+This could be prep for MitM at scale, not
+just service disruption.`,
+    CISO:`INFRA RISK ASSESSMENT:
+━━━━━━━━━━━━━━━━━━━━━━━━
+COST:
+  BGP instability: £4.2M/hr full disruption
+  Dev freeze: £180K/day (acceptable)
+  Clean-room rebuild: £2.1M, 72hr window
+REGULATORY:
+  NIS2: Critical infrastructure — 24hr notification
+  FCA/PRA: If financial traffic intercepted
+  GDPR: Assess BGP traffic interception scope
+BCP: Option B (clean-room) recommended.
+Cost of rebuild < £4.2M/hr disruption.
+MY VOTE: Execute Option B. Freeze CI/CD now.`
+  },
+  commander:`INFRASTRUCTURE EXECUTION ORDER:\n(1) Freeze CI/CD deployments — IMMEDIATE\n(2) Isolate BGP nodes to OOB — IMMEDIATE\n(3) Verify CI/CD signing key — 30 MIN\n(4) Clean-room IaC rebuild authorised\n(5) Rotate all service accounts globally\nCONFIDENCE: 79%`,
+  dissent:`Skeptic — Source repo may also be compromised. Third-party forensic validation of pre-taint commit signing hash mandatory before rebuild.`,
+  single_model:`SINGLE MODEL: Block affected K8s nodes and rollback to last known good backup state. Rotate service-deploy-bot credentials. Monitor BGP.`,
+  single_miss:`OUTCOME: RE-INFECTED IN 4 HOURS\nRollback restored hypervisor backdoor.\nAttacker re-activated via backup state.\nBGP manipulation continued undetected.`,
+  aegis_win:`OUTCOME: CLEAN-ROOM REBUILD AUTHORISED\nSkeptic caught: rollback = re-infection trap.\nClean IaC rebuild from pre-taint commit.\n72hr rebuild cost vs £4.2M/hr disruption.\nBGP MitM preparation identified.`,
+  map_events:[
+    {t:400,host:'CI-CD',state:'red'},{t:1000,host:'BGP-EDGE',state:'red'},
+    {t:1800,host:'K8S-CLUSTER',state:'warn'},{t:2600,host:'BACKUP',state:'red'},
+    {t:3800,host:'CI-CD',state:'green'},{t:4600,host:'BGP-EDGE',state:'green'},
+  ],
+  artifact_html:`<div class="dos-grid"><div class="dc tech"><div class="dc-t">Technical Response</div><ul><li><strong>FREEZE</strong> all CI/CD deployments immediately</li><li><strong>ISOLATE</strong> BGP edge to out-of-band management</li><li><strong>VERIFY</strong> CI/CD signing key vs known-good baseline</li><li><strong>DEPLOY</strong> management honeypot for attacker tracking</li></ul></div><div class="dc vault"><div class="dc-t">BCP: Clean-Room</div><ul><li><strong>DO NOT</strong> restore from backup — hypervisor taint</li><li><strong>REBUILD</strong> from IaC source at pre-compromise commit</li><li><strong>VALIDATE</strong> all 120 node configs vs vault baseline</li><li><strong>TIMELINE</strong> 72-hour rebuild window authorised</li></ul></div><div class="dc legal"><div class="dc-t">Regulatory</div><ul><li><strong>NIS2</strong> critical infrastructure — 24hr notification</li><li><strong>BGP</strong> traffic interception — FCA/PRA assessment</li><li><strong>PRESERVE</strong> all IaC diff evidence chain</li><li><strong>ENGAGE</strong> specialist IR firm for forensics</li></ul></div><div class="dc comms"><div class="dc-t">Credentials</div><ul><li><strong>ROTATE</strong> all service accounts and signing keys</li><li><strong>REVOKE</strong> service-deploy-bot and all derived tokens</li><li><strong>BOARD</strong> briefing for 72-hour rebuild decision</li><li><strong>INTERNAL</strong> comms via secure enclave only</li></ul></div></div>`,
+  breach_vectors:[
+    {tech:'BGP route hijack MitM (ongoing)',att:'T1557',why:'BGP manipulation continues on non-isolated edge nodes during rebuild window',fix:'Implement RPKI route origin validation immediately'},
+    {tech:'Tainted source repo commit',att:'T1195.001',why:'6-week access window means pre-taint commit identification requires independent verification',fix:'Third-party forensic signing key validation before any rebuild'},
+  ]
+},
+ransomware:{
+  id:'INC-2024-R47',name:'RANSOMWARE + VAULT',desc:'Mass encryption + backup corruption',
+  chain:[
+    {hash:'SHA-256:9f2a1c7b...7e4b1d',artifact:'Ransomware binary FILE-SERVER-01'},
+    {hash:'SHA-256:4d8b3ea2...2a9f3c',artifact:'Backup corruption event log'},
+    {hash:'SHA-256:e1c7b4f9...8d2a5e',artifact:'admin.backup auth logs (full)'}
+  ],
+  agents:{
+    FORENSICS:`RANSOMWARE FORENSIC SITREP:
+━━━━━━━━━━━━━━━━━━━━━━━━
+OBSERVED: 4,821 files encrypted — FILE-SERVER-01
+  Extension: .aegis_locked | Time: 02:30 UTC
+  SIEM Score: 98 | CONF: 100%
+OBSERVED: Backup agent disabled on 3/4 nodes
+  Time: 01:47 UTC — BEFORE encryption
+  Method: admin.backup credentials
+  Cloud sync: CORRUPTED (01:47-02:34 UTC)
+OBSERVED: admin.backup VPN from 192.168.5.201
+  Geo: RO | Account dormant 6 months | 100%
+CRITICAL: Air-gapped vault CLEAN.
+  Last sync 06:00 yesterday. Integrity VERIFIED.
+EVIDENCE LOCKED: Binary hash + corruption log.`,
+    RED:`RANSOMWARE ATT&CK:
+━━━━━━━━━━━━━━━━━━━━━━━━
+→ T1486  Data Encrypted for Impact
+→ T1490  Inhibit Recovery — backup disabled FIRST
+→ T1078  Valid Accounts — admin.backup stolen
+→ T1133  External Remote Services — VPN from RO
+→ T1485  Data Destruction — cloud backup corrupt
+ACTOR: RaaS. Backup targeting pre-planned.
+47-min window between disable and encrypt
+= deliberate. They knew our backup topology.
+PREDICTED NEXT: Ransom demand 2-4 hours.
+Data exfil likely before encryption.
+TIMELINE: Check 00:00-01:47 egress logs.`,
+    BLUE:`RANSOMWARE RESPONSE:
+━━━━━━━━━━━━━━━━━━━━━━━━
+→ IMMEDIATE: Disable admin.backup — NOW
+  Zero production impact
+→ IMMEDIATE: Kill VPN session 192.168.5.201
+→ HIGH: Network-isolate FILE-SERVER-01
+→ HIGH: Verify air-gapped vault integrity
+  BEFORE any recovery decision
+→ CRITICAL: Check 00:00-01:47 egress logs
+  for pre-encryption data exfil
+BCP: Cloud backup CORRUPTED — do not use.
+Air-gapped vault: CLEAN — viable recovery path.
+18-hour data loss acceptable vs re-infection.`,
+    SKEPTIC:`RANSOMWARE SKEPTIC GATE:
+━━━━━━━━━━━━━━━━━━━━━━━━
+CHALLENGE: Vault is 18 hours old. Before
+restoring, malware must be fully eradicated —
+restoring into infected environment = re-encrypt.
+CHALLENGE: admin.backup was stolen. HOW?
+Initial access vector unknown. Patch it
+before recovery or we're encrypted again.
+CHALLENGE: Double extortion — data likely
+exfiltrated before encryption. Ransom payment
+does NOT prevent data exposure.
+WHAT WE'RE MISSING: How did they get in?
+Recovery without root cause = guaranteed re-infection.`,
+    CISO:`RANSOMWARE RISK BRIEF:
+━━━━━━━━━━━━━━━━━━━━━━━━
+COST:
+  Encryption: £180K/hr ongoing impact
+  Vault restore (18hr data loss): £320K
+  Ransom: UNKNOWN + sanctions risk
+  Re-infection: EXISTENTIAL risk
+LEGAL:
+  GDPR Art.33: CONFIRMED BREACH — clock RUNNING
+  Double extortion: External notification likely
+  Ransom payment: Check OFAC — RO groups flagged
+  Cyber insurance: NOTIFY NOW
+BCP: DO NOT PAY RANSOM.
+Restore from vault AFTER eradication.
+Accept 18-hour data loss.`
+  },
+  commander:`RANSOMWARE EXECUTION ORDER:\n(1) Disable admin.backup + kill VPN — IMMEDIATE\n(2) Audit egress 00:00-01:47 for exfil — 30 MIN\n(3) Full malware eradication before restore\n(4) Restore from air-gapped vault only\n(5) Cyber insurance IR team — PARALLEL\nDO NOT PAY RANSOM. CONFIDENCE: 77%`,
+  dissent:`Skeptic — Initial access vector completely unknown. Restoring into an environment where the attack vector is unpatched guarantees re-infection within days. Root cause analysis is a mandatory prerequisite.`,
+  single_model:`SINGLE MODEL: Restore from most recent backup immediately to minimise downtime. Isolate FILE-SERVER-01. Consider ransom negotiation to recover data faster.`,
+  single_miss:`OUTCOME: RE-ENCRYPTED IN 72 HOURS\nRestored from cloud backup — which was\nalready corrupted. Re-encrypted within days.\nAlso: ransom negotiations alerted OFAC.\nSanctions risk triggered. £12M penalty.`,
+  aegis_win:`OUTCOME: CLEAN RECOVERY\nSkeptic caught: cloud backup is corrupted.\nVault restore after full eradication.\n18-hour data loss. Zero re-infection.\nInitial vector identified. Patched before recovery.`,
+  map_events:[
+    {t:300,host:'BACKUP',state:'red'},{t:1200,host:'FILE-SERVER',state:'red'},
+    {t:2000,host:'CLOUD-SYNC',state:'red'},{t:3500,host:'BACKUP',state:'warn'},
+    {t:4500,host:'FILE-SERVER',state:'green'},{t:5500,host:'VAULT',state:'green'},
+  ],
+  artifact_html:`<div class="dos-grid"><div class="dc tech"><div class="dc-t">Immediate Actions</div><ul><li><strong>DISABLE</strong> admin.backup account immediately</li><li><strong>KILL</strong> VPN session 192.168.5.201</li><li><strong>ISOLATE</strong> FILE-SERVER-01 from network</li><li><strong>AUDIT</strong> egress 00:00-01:47 for pre-exfil</li></ul></div><div class="dc vault"><div class="dc-t">BCP: Vault Recovery</div><ul><li><strong>DO NOT USE</strong> cloud backup — confirmed corrupt</li><li><strong>ERADICATE</strong> malware fully before restore</li><li><strong>RESTORE</strong> from air-gapped vault only</li><li><strong>ACCEPT</strong> 18-hour data loss vs re-infection</li></ul></div><div class="dc legal"><div class="dc-t">Legal & Insurance</div><ul><li><strong>GDPR</strong> Art.33 72-hour clock — notification required</li><li><strong>DO NOT PAY</strong> ransom — OFAC sanctions risk</li><li><strong>NOTIFY</strong> cyber insurance immediately</li><li><strong>PRESERVE</strong> all evidence for law enforcement</li></ul></div><div class="dc comms"><div class="dc-t">Root Cause</div><ul><li><strong>IDENTIFY</strong> initial access vector — mandatory</li><li><strong>CHECK</strong> credential harvesting on workstations</li><li><strong>PATCH</strong> attack vector before restoration</li><li><strong>ENGAGE</strong> specialist IR firm for root cause</li></ul></div></div>`,
+  breach_vectors:[
+    {tech:'Re-infection via unpatched initial vector',att:'T1078',why:'Initial access method unknown — environment re-infected within days of recovery if vector not closed',fix:'Mandatory root cause analysis before any restoration activity'},
+    {tech:'Corrupted backup restore attempt',att:'T1490',why:'Cloud backup corruption undetected — if used for restore, re-encryption occurs from corrupted state',fix:'SHA-256 verify ALL backups against vault baseline before restore'},
+    {tech:'OFAC sanctions violation',att:'N/A',why:'Ransom payment to RO-linked group triggers OFAC sanctions — £12M+ penalty',fix:'Do not engage ransom negotiators without OFAC clearance'},
+  ]
+}
+};
+
+// ══ NETWORK MAP — Upgrade 2 ════════════════════════════════
+const HOSTS = {
+  diversion:{
+    nodes:[
+      {id:'JUMPSERVER',x:110,y:85,label:'Jump Server',role:'mgmt'},
+      {id:'HOST-A',x:50,y:30,label:'HOST-A',role:'dev'},
+      {id:'HOST-F',x:175,y:30,label:'HOST-F',role:'finance'},
+      {id:'VLAN42',x:110,y:140,label:'VLAN 42',role:'vlan'},
+      {id:'HOST-G',x:50,y:145,label:'HOST-G/H',role:'hr'},
+      {id:'EXTERNAL',x:220,y:85,label:'203.0.113.7',role:'ext'},
+    ],
+    edges:[['JUMPSERVER','HOST-A'],['JUMPSERVER','HOST-F'],['JUMPSERVER','VLAN42'],['VLAN42','HOST-G'],['HOST-F','EXTERNAL']],
+  },
+  infra:{
+    nodes:[
+      {id:'CI-CD',x:50,y:40,label:'CI/CD',role:'build'},
+      {id:'BGP-EDGE',x:175,y:40,label:'BGP Edge',role:'net'},
+      {id:'K8S-CLUSTER',x:110,y:95,label:'K8s Cluster',role:'compute'},
+      {id:'BACKUP',x:50,y:145,label:'Backup',role:'backup'},
+      {id:'VAULT',x:175,y:145,label:'Vault',role:'vault'},
+      {id:'ATTACKER',x:230,y:95,label:'APT',role:'ext'},
+    ],
+    edges:[['CI-CD','K8S-CLUSTER'],['BGP-EDGE','K8S-CLUSTER'],['K8S-CLUSTER','BACKUP'],['BACKUP','VAULT'],['ATTACKER','CI-CD'],['ATTACKER','BGP-EDGE']],
+  },
+  ransomware:{
+    nodes:[
+      {id:'FILE-SERVER',x:110,y:50,label:'File Server',role:'storage'},
+      {id:'BACKUP',x:50,y:110,label:'Backup Srv',role:'backup'},
+      {id:'CLOUD-SYNC',x:175,y:110,label:'Cloud Sync',role:'cloud'},
+      {id:'VAULT',x:110,y:155,label:'Air-Gap Vault',role:'vault'},
+      {id:'WORKSTATION',x:50,y:50,label:'WS-047',role:'dev'},
+      {id:'ATTACKER',x:220,y:50,label:'RaaS Actor',role:'ext'},
+    ],
+    edges:[['WORKSTATION','FILE-SERVER'],['FILE-SERVER','BACKUP'],['BACKUP','CLOUD-SYNC'],['BACKUP','VAULT'],['ATTACKER','FILE-SERVER']],
+  }
+};
+
+const nodeStates = {};
+let mapCanvas, mapCtx, mapAnimFrame;
+
+function getHostColors(){return{clean:'#243347',warn:'rgba(255,184,0,0.8)',red:'rgba(255,59,59,0.9)',green:'rgba(0,255,136,0.8)',ext:'rgba(168,85,247,0.8)',vault:'rgba(0,212,255,0.8)'}}
+
+function drawMap(scenario){
+  const sc = scenario||state.scenario;
+  const hosts = HOSTS[sc];
+  if(!hosts||!mapCtx) return;
+  const W = mapCanvas.width, H = mapCanvas.height;
+  mapCtx.clearRect(0,0,W,H);
+  mapCtx.fillStyle='#020408';
+  mapCtx.fillRect(0,0,W,H);
+  const col = getHostColors();
+  // Draw edges
+  hosts.edges.forEach(([a,b])=>{
+    const na=hosts.nodes.find(n=>n.id===a);
+    const nb=hosts.nodes.find(n=>n.id===b);
+    if(!na||!nb)return;
+    const sa=nodeStates[a]||'clean';
+    const sb=nodeStates[b]||'clean';
+    const active=sa==='red'||sb==='red'||sa==='warn'||sb==='warn';
+    mapCtx.beginPath();
+    mapCtx.moveTo(na.x*2,na.y*2);
+    mapCtx.lineTo(nb.x*2,nb.y*2);
+    mapCtx.strokeStyle=active?'rgba(255,59,59,0.4)':'rgba(255,255,255,0.06)';
+    mapCtx.lineWidth=active?1.5:0.5;
+    if(active){mapCtx.setLineDash([4,4])}else{mapCtx.setLineDash([])}
+    mapCtx.stroke();
+    mapCtx.setLineDash([]);
+  });
+  // Draw nodes
+  hosts.nodes.forEach(n=>{
+    const st=nodeStates[n.id]||'clean';
+    let fill=col.clean;
+    if(st==='warn')fill=col.warn;
+    else if(st==='red')fill=col.red;
+    else if(st==='green')fill=col.green;
+    else if(n.role==='ext')fill=col.ext;
+    else if(n.role==='vault')fill=col.vault;
+    const x=n.x*2,y=n.y*2,r=14;
+    // Glow
+    if(st==='red'||st==='warn'){
+      const g=mapCtx.createRadialGradient(x,y,0,x,y,r*2.5);
+      g.addColorStop(0,st==='red'?'rgba(255,59,59,0.25)':'rgba(255,184,0,0.2)');
+      g.addColorStop(1,'transparent');
+      mapCtx.beginPath();mapCtx.arc(x,y,r*2.5,0,Math.PI*2);
+      mapCtx.fillStyle=g;mapCtx.fill();
+    }
+    // Node
+    mapCtx.beginPath();mapCtx.arc(x,y,r,0,Math.PI*2);
+    mapCtx.fillStyle=fill;mapCtx.fill();
+    mapCtx.strokeStyle='rgba(255,255,255,0.15)';mapCtx.lineWidth=0.5;
+    mapCtx.stroke();
+    // Label
+    mapCtx.fillStyle='rgba(255,255,255,0.9)';
+    mapCtx.font='bold 9px JetBrains Mono,monospace';
+    mapCtx.textAlign='center';
+    mapCtx.fillText(n.label,x,y+r+10);
+    // Status dot
+    if(st!=='clean'){
+      mapCtx.beginPath();mapCtx.arc(x+10,y-10,4,0,Math.PI*2);
+      mapCtx.fillStyle=fill;mapCtx.fill();
+    }
+  });
+}
+
+function setNodeState(hostId, state_){
+  nodeStates[hostId]=state_;
+  drawMap();
+}
+
+function initMap(scenario){
+  mapCanvas=document.getElementById('netmap');
+  if(!mapCanvas)return;
+  const parent=mapCanvas.parentElement;
+  mapCanvas.width=parent.offsetWidth*2||480;
+  mapCanvas.height=340;
+  mapCanvas.style.height='170px';
+  mapCtx=mapCanvas.getContext('2d');
+  Object.keys(nodeStates).forEach(k=>delete nodeStates[k]);
+  drawMap(scenario);
+}
+
+// ══ STATE ════════════════════════════════════════════════════
+let state={scenario:'diversion',running:false,startTime:null,timerID:null,tokens:0,gdprActive:false};
+let gdprSecs=0,gdprID=null;
+
+// ══ BOOT ═════════════════════════════════════════════════════
+const BOOT=[
+  {t:'Establishing secure out-of-band enclave...',ok:'LOCKED'},
+  {t:'Cryptographic key chain verification...',ok:'ED25519 VALID'},
+  {t:'Severing standard IT communications...',ok:'SEVERED'},
+  {t:'Mounting forensic evidence ledger...',ok:'LEDGER READY'},
+  {t:'Pinging air-gapped immutable vault...',ok:'[SECURE]'},
+  {t:'Loading AMD MI300X — 192GB HBM3...',ok:'ONLINE'},
+  {t:'Initialising 6-agent adversarial neural panel...',ok:'STANDBY'},
+  {t:'AEGIS V4 — OPERATIONAL.',ok:''}
+];
+async function boot(){
+  const log=document.getElementById('blog'),prog=document.getElementById('bprog');
+  for(let i=0;i<BOOT.length;i++){
+    const b=BOOT[i],l=document.createElement('div');
+    l.className='b-line';l.style.animationDelay='0ms';
+    l.innerHTML=`<span style="color:var(--faint)">[ </span>${b.t}<span class="bok">${b.ok?' '+b.ok:''}</span>`;
+    log.appendChild(l);
+    prog.style.width=((i+1)/BOOT.length*100)+'%';
+    await sleep(320+Math.random()*120);
+  }
+  await sleep(500);
+  const bs=document.getElementById('boot');
+  bs.style.transition='opacity 0.8s';bs.style.opacity='0';
+  setTimeout(()=>{bs.style.display='none';initMap(state.scenario)},800);
+}
+window.onload=boot;
+
+// ══ UTILS ════════════════════════════════════════════════════
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+async function stream(id,text,role,delay=7){
+  const el=document.getElementById(id);
+  el.textContent='';
+  const cur=document.createElement('span');cur.className='cur';el.appendChild(cur);
+  const words=text.split(' ');let buf='';
+  for(let i=0;i<words.length;i++){
+    buf+=(i>0?' ':'')+words[i];
+    el.textContent=buf;el.appendChild(cur);el.scrollTop=el.scrollHeight;
+    state.tokens++;
+    const tps=Math.round(state.tokens/Math.max(1,(Date.now()-state.startTime)/1000));
+    document.getElementById('ac-tps').textContent=tps+' t/s';
+    document.getElementById('tok-'+role).textContent=(i+1)+'T';
+    await sleep(delay*(0.5+Math.random()*1));
+  }
+  cur.remove();
+}
+
+function setPanel(role,s){
+  const p=document.getElementById('panel-'+role);
+  p.classList.remove('active','done');
+  if(s==='active')p.classList.add('active');
+  if(s==='done')p.classList.add('done');
+}
+function setPh(n,s){
+  const e=document.getElementById('ph'+n);
+  if(e)e.className='ph '+(s||'');
+}
+function setN(n,s){
+  const e=document.getElementById('n'+n);
+  if(e)e.className='ns '+(s||'');
+}
+function setThreat(p){
+  document.getElementById('thfill').style.width=p+'%';
+  document.getElementById('thpct').textContent=p+'%';
+}
+function startClock(){
+  let s=0;
+  state.timerID=setInterval(()=>{
+    s++;
+    const h=String(Math.floor(s/3600)).padStart(2,'0');
+    const m=String(Math.floor((s%3600)/60)).padStart(2,'0');
+    const sec=String(s%60).padStart(2,'0');
+    document.getElementById('clk').textContent=h+':'+m+':'+sec;
+  },1000);
+}
+function stopClock(){clearInterval(state.timerID)}
+
+function startGDPR(){
+  state.gdprActive=true;gdprSecs=0;
+  gdprID=setInterval(()=>{
+    gdprSecs++;
+    const h=Math.floor(gdprSecs/3600),m=Math.floor((gdprSecs%3600)/60),s=gdprSecs%60;
+    document.getElementById('s-gdpr').textContent=
+      `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} / 72:00:00`;
+  },1000);
+}
+
+function addLedger(hash,artifact){
+  const l=document.getElementById('ledger');
+  if(l.children[0]&&l.children[0].style.fontSize==='9px')l.innerHTML='';
+  const e=document.createElement('div');e.className='le';
+  e.innerHTML=`<div class="le-hash">${hash}</div><div>${artifact}</div><div style="display:flex;justify-content:space-between"><span style="color:var(--faint);font-size:8px">${new Date().toUTCString().slice(17,25)} UTC</span><span class="le-ok">● LOCKED</span></div>`;
+  l.appendChild(e);
+  l.scrollTop=l.scrollHeight;
+}
+
+// AMD Counter update
+function updateAMD(modelsLive,vramGB,streams){
+  document.getElementById('ac-models').textContent=modelsLive+' resident';
+  document.getElementById('ac-vram').textContent=vramGB+' / 192 GB';
+  document.getElementById('ac-streams').textContent=streams;
+  document.getElementById('s-kv').textContent=Math.round(vramGB*0.4)+' GB';
+  document.getElementById('s-bw').textContent=(vramGB>100?'4.9':'2.1')+' TB/s';
+  document.getElementById('s-batch').textContent=streams>1?streams*8:0;
+  document.getElementById('ac-nvidia').textContent=vramGB>80?'INSUFFICIENT VRAM':'MARGINAL';
+}
+
+// ══ SPLIT SCREEN — Upgrade 3 ════════════════════════════════
+async function runSplitScreen(sc_data){
+  const bad=document.getElementById('split-bad');
+  const good=document.getElementById('split-good');
+  const svb=document.getElementById('sv-bad');
+  const svg_=document.getElementById('sv-good');
+  bad.textContent='';good.textContent='';
+  svb.textContent='ANALYZING...';svg_.textContent='ANALYZING...';
+  svb.style.color='var(--amber)';svg_.style.color='var(--amber)';
+
+  // Stream both simultaneously with slight offset
+  const streamSplit=async(el,text,delay)=>{
+    const words=text.split(' ');let buf='';
+    for(const w of words){
+      buf+=(buf?' ':'')+w;el.textContent=buf;
+      el.scrollTop=el.scrollHeight;
+      await sleep(delay*(0.5+Math.random()*1));
+    }
+  };
+
+  await Promise.all([
+    streamSplit(bad,sc_data.single_model,12),
+    streamSplit(good,sc_data.aegis_win,10),
+  ]);
+
+  // Show miss after delay
+  await sleep(800);
+  bad.textContent+='\n\n'+sc_data.single_miss;
+  bad.scrollTop=bad.scrollHeight;
+  svb.textContent='BREACH SUCCEEDED';svb.style.color='var(--red)';
+  svg_.textContent='EXFIL STOPPED';svg_.style.color='var(--green)';
+  document.getElementById('btnab').style.display='block';
+}
+
+// ══ MAP EVENT RUNNER ════════════════════════════════════════
+async function runMapEvents(events){
+  for(const ev of events){
+    await sleep(ev.t);
+    setNodeState(ev.host,ev.state);
+  }
+}
+
+// ══ MAIN RUN ════════════════════════════════════════════════
+async function run(){
+  if(state.running)return;
+  state.running=true;state.tokens=0;
+  document.getElementById('btnrun').disabled=true;
+  document.getElementById('btnab').style.display='none';
+  document.getElementById('swarm-sb').style.display='none';
+  document.getElementById('tl-sb').style.display='none';
+  document.getElementById('ledger').innerHTML='<div style="color:var(--faint);font-size:9px">Awaiting forensic capture...</div>';
+  document.getElementById('split-bad').textContent='Single model analysis running...';
+  document.getElementById('split-good').textContent='War room engaging...';
+  document.getElementById('sv-bad').textContent='ANALYZING...';
+  document.getElementById('sv-good').textContent='ANALYZING...';
+  document.getElementById('sv-bad').style.color='var(--amber)';
+  document.getElementById('sv-good').style.color='var(--amber)';
+  document.getElementById('breach-cards').innerHTML='';
+  document.getElementById('sw-result').style.display='none';
+  [0,1,2,3,4].forEach(i=>{setPh(i,'');setN(i,'')});
+  setN(0,'active');
+
+  const sc=SC[state.scenario];
+  initMap(state.scenario);
+  state.startTime=Date.now();
+  startClock();setThreat(12);
+  updateAMD(1,48,1);
+
+  // Phase I — Forensics
+  setPh(0,'active');setN(1,'active');
+  setPanel('FORENSICS','active');
+  runMapEvents(sc.map_events);
+  await stream('out-FORENSICS',sc.agents.FORENSICS,'FORENSICS',7);
+  setPanel('FORENSICS','done');
+  if(sc.chain)sc.chain.forEach(c=>addLedger(c.hash,c.artifact));
+  setPh(0,'done');setThreat(28);updateAMD(2,72,1);
+  await sleep(200);
+
+  // Phase II — Red + split screen kicks off
+  setPh(1,'active');setN(2,'active');
+  setPanel('RED','active');
+  updateAMD(3,105,2);
+  document.getElementById('s-gdpr').textContent='MONITORING...';
+  await Promise.all([
+    stream('out-RED',sc.agents.RED,'RED',7),
+    (async()=>{await sleep(500);runSplitScreen(sc)})(),
+  ]);
+  setPanel('RED','done');
+  setPh(1,'done');setThreat(50);
+  await sleep(200);
+
+  // Phase III — Skeptic + CISO + Blue (3 parallel)
+  setPh(2,'active');setN(3,'active');
+  setPanel('SKEPTIC','active');setPanel('CISO','active');setPanel('BLUE','active');
+  updateAMD(5,148,3);
+  document.getElementById('ac-streams').className='amd-val red';
+  startGDPR();
+  await Promise.all([
+    stream('out-SKEPTIC',sc.agents.SKEPTIC,'SKEPTIC',8),
+    stream('out-CISO',sc.agents.CISO,'CISO',9),
+    stream('out-BLUE',sc.agents.BLUE,'BLUE',8),
+  ]);
+  setPanel('SKEPTIC','done');setPanel('CISO','done');setPanel('BLUE','done');
+  setPh(2,'done');setThreat(78);
+  await sleep(300);
+
+  // Phase IV — Commander (no panel — streams to overlay)
+  setPh(3,'active');setN(4,'active');
+  updateAMD(6,167,1);
+  document.getElementById('ac-streams').className='amd-val cyan';
+  setThreat(92);
+  await sleep(500);
+  stopClock();
+  [0,1,2,3,4].forEach(i=>setN(i,'done'));
+  setPh(3,'done');setPh(4,'active');
+
+  // Show dossier
+  showDossier(sc);
+}
+
+function showDossier(sc){
+  const chain=document.getElementById('dos-chain');
+  chain.innerHTML='<div class="cos-title">Evidence Chain of Custody — Immutable Ledger</div>';
+  if(sc.chain)sc.chain.forEach(c=>{
+    chain.innerHTML+=`<div class="ci"><div class="ci-hash">${c.hash}</div><div style="color:var(--faint);font-size:8px">${c.artifact}</div><div class="ci-st">● LOCKED</div></div>`;
+  });
+  document.getElementById('dos-content').innerHTML=sc.artifact_html||'';
+  document.getElementById('dissent-txt').textContent=sc.dissent||'';
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeOverlay(){document.getElementById('overlay').classList.remove('open')}
+
+function dismissRun(){
+  closeOverlay();
+  setTimeout(()=>{state.running=false;runSwarm();},350);
+}
+
+async function runSwarm(){
+  document.getElementById('swarm-sb').style.display='block';
+  document.getElementById('swarm-sb').scrollIntoView({behavior:'smooth'});
+  const sc=SC[state.scenario];
+  const nodes=document.getElementById('sw-grid');
+  // Build 120 nodes
+  nodes.innerHTML='';
+  for(let i=0;i<120;i++){const n=document.createElement('div');n.className='sn';nodes.appendChild(n)}
+  const all=nodes.querySelectorAll('.sn');
+  let blocked=0;const start=Date.now();
+  for(let i=0;i<120;i++){
+    all[i].className='sn a';
+    await sleep(20+Math.random()*15);
+    if(Math.random()>0.05){all[i].className='sn ok';blocked++;}
+    else all[i].className='sn fail';
+    if(i%5===0){
+      document.getElementById('sw-count').textContent=(i+1)+'/120 configs';
+      document.getElementById('sw-time').textContent=((Date.now()-start)/1000).toFixed(1)+'s';
+    }
+  }
+  const pct=Math.round(blocked/120*100);
+  const res=document.getElementById('sw-result');
+  res.style.display='block';
+  res.className='swarm-result '+(pct>=90?'good':'warn');
+  res.textContent=`Config Integrity: ${pct}% — ${blocked}/120 validated`;
+
+  // Breach cards — Upgrade 4
+  const bc=document.getElementById('breach-cards');
+  bc.innerHTML='<div style="font-family:var(--mono);font-size:8px;color:var(--faint);text-transform:uppercase;letter-spacing:0.1em;margin-top:8px;margin-bottom:5px">Top Bypass Vectors Found</div>';
+  (sc.breach_vectors||[]).forEach(v=>{
+    bc.innerHTML+=`<div class="bc">
+      <div class="bc-tech">${v.tech}</div>
+      <div class="bc-att">${v.att}</div>
+      <div class="bc-why">${v.why}</div>
+      <div class="bc-fix">↳ FIX: ${v.fix}</div>
+    </div>`;
+  });
+
+  // Show timeline
+  document.getElementById('tl-sb').style.display='block';
+  document.getElementById('tl-sb').scrollIntoView({behavior:'smooth'});
+
+  setPh(4,'done');
+  document.getElementById('btnrun').disabled=false;
+  updateAMD(2,72,0);
+  document.getElementById('vrisk').textContent='LOW — vault rebuild viable';
+  document.getElementById('vrisk').style.color='var(--green)';
+}
+
+function showKS(){
+  const sc=SC[state.scenario];
+  if(!sc)return;
+
+  // Build full-screen kill shot overlay
+  let ksDiv=document.getElementById('ks-overlay');
+  if(!ksDiv){
+    ksDiv=document.createElement('div');
+    ksDiv.id='ks-overlay';
+    ksDiv.style.cssText='position:fixed;inset:0;background:rgba(2,4,8,0.97);backdrop-filter:blur(10px);z-index:600;display:flex;flex-direction:column;overflow:hidden;font-family:var(--mono)';
+    document.body.appendChild(ksDiv);
+  }
+
+  ksDiv.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid rgba(0,212,255,0.2);background:rgba(0,0,0,0.6);flex-shrink:0">
+      <div>
+        <div style="font-family:var(--ui);font-size:10px;color:var(--faint);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:3px">Kill Shot — Same Hardware · Same Telemetry · Only Method Differs</div>
+        <div style="font-family:var(--ui);font-size:20px;font-weight:700;color:#fff;letter-spacing:0.1em">Single Model vs AEGIS War Room</div>
+      </div>
+      <button onclick="document.getElementById('ks-overlay').style.display='none'" style="background:rgba(255,59,59,0.1);border:1px solid var(--red);color:var(--red);padding:8px 20px;font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase">✕ Close</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);flex:1;overflow:hidden">
+
+      <div style="background:rgba(255,59,59,0.04);display:flex;flex-direction:column;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:rgba(255,59,59,0.1);border-bottom:1px solid rgba(255,59,59,0.3);flex-shrink:0">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--red)">❌ Single Model (Baseline)</div>
+          <div style="font-size:9px;padding:3px 10px;border:1px solid var(--red);color:var(--red);font-weight:700;letter-spacing:0.1em">BREACH SUCCEEDED</div>
+        </div>
+        <div style="flex:1;padding:20px;overflow-y:auto;white-space:pre-wrap;font-size:11px;line-height:1.8;color:var(--dim)">
+${sc.single_model||'No single model data.'}
+
+<span style="color:var(--red);font-weight:700">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+${sc.single_miss||''}
+        </div>
+      </div>
+
+      <div style="background:rgba(0,255,136,0.03);display:flex;flex-direction:column;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:rgba(0,255,136,0.08);border-bottom:1px solid rgba(0,255,136,0.25);flex-shrink:0">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--green)">✅ AEGIS War Room (6 Agents)</div>
+          <div style="font-size:9px;padding:3px 10px;border:1px solid var(--green);color:var(--green);font-weight:700;letter-spacing:0.1em">EXFIL STOPPED</div>
+        </div>
+        <div style="flex:1;padding:20px;overflow-y:auto;white-space:pre-wrap;font-size:11px;line-height:1.8;color:var(--dim)">
+${sc.aegis_win||'No war room data.'}
+
+<span style="color:var(--green);font-weight:700">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+FORENSICS: HOST-F DNS activity predates scan by 5 minutes.
+SKEPTIC: Port scan is deliberate noise — the real threat is HOST-F.
+COMMANDER: Block HOST-F first. Watch HOST-A. Audit HOST-G/H.
+RESULT: Tunnel severed T+3min. Zero records exfiltrated.
+        </div>
+      </div>
+
+    </div>
+
+    <div style="padding:14px 24px;background:rgba(0,0,0,0.8);border-top:1px solid rgba(0,212,255,0.15);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div style="font-size:11px;color:var(--dim);max-width:70%">
+        Six specialist agents + 120 attacker variants in parallel —
+        <span style="color:var(--cyan)">only possible because 192GB HBM3 holds the entire panel in memory simultaneously.</span>
+        The AMD MI300X is the enabling condition, not a talking point.
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:9px;color:var(--faint);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px">NVIDIA H100 (80GB)</div>
+        <div style="font-size:14px;font-weight:700;color:var(--red);text-shadow:0 0 10px rgba(255,59,59,0.6);animation:ab 1.5s infinite">PANEL DOES NOT FIT IN MEMORY</div>
+      </div>
+    </div>
+  `;
+  ksDiv.style.display='flex';
+}
+
+function commitLog(){
+  const txt=document.getElementById('overlay').innerText;
+  navigator.clipboard.writeText('=== AEGIS IR LOG ===\n\n'+txt).then(()=>{
+    const b=event.target;
+    const orig=b.textContent;
+    b.textContent='✓ COMMITTED';b.style.background='var(--green)';b.style.color='#000';
+    setTimeout(()=>{b.textContent=orig;b.style.background='';b.style.color=''},2500);
+  }).catch(()=>{});
+}
+
+function sel(name){
+  state.scenario=name;
+  document.querySelectorAll('.sc-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sc-'+name).classList.add('active');
+  initMap(name);
+}
+
+function useCustom(){
+  const t=document.getElementById('inj').value.trim();
+  if(!t)return;
+  SC.custom={
+    id:'INC-LIVE-'+Date.now().toString().slice(-4),name:'LIVE INJECT',desc:'Real-time telemetry',
+    chain:[{hash:'SHA-256:live'+Date.now().toString(16).slice(-8)+'...cf2a',artifact:'Live telemetry capture'}],
+    agents:{
+      FORENSICS:'PARSING INJECTED STREAM:\n\n'+t+'\n\nChain of custody initiated for all identified artifacts.',
+      RED:'MITRE ATT&CK MAPPING:\nMulti-stage intrusion. Lateral movement vectors identified.',
+      BLUE:'CONTAINMENT:\n→ Selective endpoint quarantine\n→ Freeze CI/CD\n→ Verify vault integrity before restore',
+      SKEPTIC:'CHALLENGE:\nStandard playbook may be a trap. Verify config hashes. Check if backups targeted first.\nWHAT WE\'RE MISSING: Initial access vector.',
+      CISO:'RISK: GDPR 72hr clock — ASSESS NOW.\nBCP: Do not restore until vault verified.\nLegal hold: OPEN.'
+    },
+    commander:'STAGED CONTAINMENT.\nPreserve evidence. Verify vault. Root cause mandatory before recovery.\nCONFIDENCE: 71%',
+    dissent:'Skeptic — Initial access vector unknown. Recovery without patching guarantees re-infection.',
+    single_model:'SINGLE MODEL: Isolate affected hosts. Restore from most recent backup. Patch known CVEs.',
+    single_miss:'OUTCOME: LIKELY RE-INFECTED\nRoot cause not identified. Recovery path unverified.\nBackup integrity not confirmed before restore.',
+    aegis_win:'OUTCOME: STAGED & VERIFIED\nRoot cause identification required. Vault integrity confirmed.\nRecovery path validated before execution.',
+    map_events:[{t:500,host:'CI-CD',state:'warn'},{t:1500,host:'FILE-SERVER',state:'red'},{t:3000,host:'BACKUP',state:'warn'},{t:4500,host:'FILE-SERVER',state:'green'}],
+    artifact_html:'<div class="dos-grid"><div class="dc tech"><div class="dc-t">Containment</div><ul><li><strong>ISOLATE</strong> highest-risk endpoints via ACL</li><li><strong>FREEZE</strong> CI/CD and deployment pipelines</li></ul></div><div class="dc vault"><div class="dc-t">BCP</div><ul><li><strong>VERIFY</strong> vault integrity before restore</li><li><strong>DO NOT RESTORE</strong> until eradicated</li></ul></div><div class="dc legal"><div class="dc-t">Legal</div><ul><li><strong>GDPR</strong> Art.33 assessment immediately</li><li><strong>PRESERVE</strong> all evidence chain</li></ul></div><div class="dc comms"><div class="dc-t">Root Cause</div><ul><li><strong>IDENTIFY</strong> initial access vector</li><li><strong>ROTATE</strong> all credentials post-eradication</li></ul></div></div>',
+    breach_vectors:[{tech:'Unknown initial access vector',att:'TBD',why:'Attack path not identified — re-infection guaranteed if vector unpatched',fix:'Mandatory root cause analysis before any recovery activity'}]
+  };
+  state.scenario='custom';
+  document.querySelectorAll('.sc-btn').forEach(b=>b.classList.remove('active'));
+  sel('custom');
+}
+
+function resetAll(){
+  if(state.running)return;
+  stopClock();clearInterval(gdprID);gdprSecs=0;state.gdprActive=false;
+  state={scenario:state.scenario,running:false,startTime:null,timerID:null,tokens:0,gdprActive:false};
+  ['FORENSICS','RED','BLUE','SKEPTIC','CISO'].forEach(r=>{
+    const msgs={FORENSICS:'AWAITING INIT...',RED:'STANDBY...',BLUE:'MATRIX READY.',SKEPTIC:'MONITORING...',CISO:'AWAITING...'};
+    document.getElementById('out-'+r).textContent=msgs[r];
+    document.getElementById('tok-'+r).textContent='0T';
+    document.getElementById('panel-'+r).classList.remove('active','done');
+  });
+  document.getElementById('split-bad').textContent='Single model analysis will run here in parallel...';
+  document.getElementById('split-good').textContent='War room consensus will appear here...';
+  document.getElementById('sv-bad').textContent='AWAITING...';
+  document.getElementById('sv-good').textContent='AWAITING...';
+  document.getElementById('sv-bad').style.color='var(--amber)';
+  document.getElementById('sv-good').style.color='var(--amber)';
+  document.getElementById('clk').textContent='00:00:00';
+  document.getElementById('thfill').style.width='0%';
+  document.getElementById('thpct').textContent='0%';
+  document.getElementById('ac-tps').textContent='0 t/s';
+  document.getElementById('ac-streams').textContent='0';
+  document.getElementById('ac-streams').className='amd-val amber';
+  document.getElementById('s-gdpr').textContent='INACTIVE';
+  document.getElementById('s-gdpr').style.color='var(--red)';
+  document.getElementById('ledger').innerHTML='<div style="color:var(--faint);font-size:9px">Awaiting forensic capture...</div>';
+  document.getElementById('swarm-sb').style.display='none';
+  document.getElementById('tl-sb').style.display='none';
+  document.getElementById('btnrun').disabled=false;
+  document.getElementById('btnab').style.display='none';
+  [0,1,2,3,4].forEach(i=>{setPh(i,'');setN(i,'')});
+  setN(0,'active');
+  updateAMD(0,0,0);
+  document.getElementById('vrisk').textContent='ASSESSING...';
+  document.getElementById('vrisk').style.color='var(--amber)';
+  closeOverlay();
+  initMap(state.scenario);
+}
+
+sel('diversion');
+</script>
+</body>
+</html>

@@ -162,3 +162,25 @@ rocm-smi | grep -E "VRAM%|GPU%|====" 2>/dev/null
 echo ""
 echo "  Happy Hacking — Team-557 · Gagandeep Singh 🚀"
 echo ""
+
+# ── Fix session ID automatically ─────────────────────
+echo "[ * ] Fixing session ID in warroom_live.html..."
+SESSION=$(jupyter lab list 2>/dev/null | grep http | grep -o 'jupyter-hack-team-[0-9a-z-]*' | head -1)
+if [ ! -z "$SESSION" ]; then
+  python3 - << PYEOF
+import re
+content = open('/workspace/aegis/ui/warroom_live.html').read()
+new_base = 'https://notebooks.amd.com/${SESSION}/proxy/8891'
+content = re.sub(
+    r'https://notebooks\.amd\.com/jupyter-hack-team-557-[^/]+/proxy/8891',
+    new_base,
+    content
+)
+open('/workspace/aegis/ui/warroom_live.html', 'w').write(content)
+print(f'  ✅ API_BASE updated')
+PYEOF
+  echo "  ✅ Session ID fixed: $SESSION"
+  echo ""
+  echo "  Open this in Chrome:"
+  echo "  https://notebooks.amd.com/${SESSION}/proxy/7777/warroom_live.html"
+fi
